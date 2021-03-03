@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <fstream>
 #include <memory>
+#include <numeric>
 class Vector2Elm
 {
     public:
@@ -191,7 +192,32 @@ class Body{
 class SolarSystem{
     public:
     SolarSystem(){
-    };
+        std::ifstream filestream("./planets.txt");
+        std::string line;
+        int numlines = 0;
+        bool is_imported = true;
+        if (filestream.is_open()){
+            while (std::getline(filestream, line)){
+                numlines +=1;
+                if(numlines >1){
+                    Vector2Elm pos, vel, accel;
+                    double ang_pos, ang_vel, mass, J, perihl, aphl;
+                    std::string name;
+                    std::istringstream strstream(line);
+                    if(strstream >> pos.x_>> pos.y_ >> vel.x_ >> vel.y_ >> accel.x_ >> accel.y_ >> ang_pos >> ang_vel >> mass >> J >> name >> perihl >> aphl){
+                        std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl));
+                        AddBody(std::move(b));
+                        std::cout<< numlines <<"\n";
+                        is_imported_ = is_imported && true;
+                    }else{
+                        std::cerr << "Cannot load the planets data!"<<"\n";
+                        is_imported_ = false;
+                    }
+                }
+            }
+            CenterOfMass();
+        }
+    }
     void AddBody(std::unique_ptr<Body> body){
         bodies_.emplace_back(std::move(body));
     }
@@ -219,46 +245,40 @@ class SolarSystem{
         bodies_[id]->PrintBody();
         }        
     }
+    void TotalMass(){
+        for(auto body = bodies_.begin(); body != bodies_.end(); body++){
+            totalMass_ +=(**body).GetMass();
+        }
+    }
 
+    void CenterOfMass(){
+         TotalMass();
+         position_ = {0,0};
+        for(auto body = bodies_.begin(); body != bodies_.end(); body++){
+            
+            position_= ((**body).GetPosition()*(**body).GetMass());
+        }
+        position_ = position_/totalMass_;
+    }
+    double GetTotalMass(){return totalMass_;}
+    Vector2Elm GetPosition(){return position_;}
+    bool GetIsImported(){return is_imported_;}
     private:
     std::vector<std::shared_ptr<Body>> bodies_;
     bool is_start = true;
+    Vector2Elm position_;
+    double totalMass_= 0;;
+    bool is_imported_= false;
 };
 
 #endif
 
-bool CreateSolarSystem(SolarSystem &solar_system){
-    std::ifstream filestream("./planets.txt");
-    std::string line;
-    int numlines = 0;
-    bool is_imported = true;
-    if (filestream.is_open()){
-        while (std::getline(filestream, line)){
-            numlines +=1;
-            if(numlines >1){
-                Vector2Elm pos, vel, accel;
-                double ang_pos, ang_vel, mass, J, perihl, aphl;
-                std::string name;
-                std::istringstream strstream(line);
-                if(strstream >> pos.x_>> pos.y_ >> vel.x_ >> vel.y_ >> accel.x_ >> accel.y_ >> ang_pos >> ang_vel >> mass >> J >> name >> perihl >> aphl){
-                    std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl));
-                    solar_system.AddBody(std::move(b));
-                    std::cout<< numlines <<"\n";
-                    is_imported = is_imported && true;
-                }else{
-                    std::cerr << "Cannot load the planets data!"<<"\n";
-                    is_imported = false;
-                }
-            }
-        }
-    }
-    return is_imported;
-}
+
 int main(){ 
     SolarSystem solar_system;
-    bool import_success = true;
-    import_success = CreateSolarSystem(solar_system);
-    if(import_success){    
+    std::cout<< "Total Mass of solar system is: " << solar_system.GetTotalMass() <<"\n";
+    std::cout<< "("<<solar_system.GetPosition().x_<<", " << solar_system.GetPosition().y_<<")\n";
+    if(solar_system.GetIsImported()){    
         double dt = 10;
         long long year = sqrt(4 * 3.1415*3.1415/6.67/1.989*pow(159.6,3.0)*1e8)/dt;
         year = 3600*24*366/10;
@@ -268,7 +288,7 @@ int main(){
                 solar_system.PrintBody(0);
             }
   
-        }
+        }    
     }
 }
 
