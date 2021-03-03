@@ -6,6 +6,7 @@
 #include <vector>
 #include <exception>
 #include <iomanip>
+#include <fstream>
 class Vector2Elm
 {
     public:
@@ -113,7 +114,7 @@ class Body{
          angular_velocity_{0.},
          mass_{0.},
          mass_moment_Inertia_{0.},
-         bodyName_{"earth"},
+         bodyName_{""},
          Perihelion_{0.},
          Aphelion_{0.}{}
 
@@ -128,15 +129,14 @@ class Body{
     std::string GetName(){return bodyName_;}
 
     Vector2Elm GravityForcePerMass(const Body *b){
-        const double GravitationalConst = 6.67*1.989*10/152.1/152.1/152.1e9; 
-        //6.67e-11*1.989e30/152.1e9/152.1e9;
+        const double GravitationalConst = 0.0000003929131713; 
         Vector2Elm deltaPosition = b->position_- position_;
         return (deltaPosition)/pow(deltaPosition.abs(), 3.0)*(GravitationalConst * b->mass_);
     }
-        void UpdateAcceleration(std::vector<Body*> bodies){
+        void UpdateAcceleration(std::vector<Body*> &bodies){
         Vector2Elm force(0,0);
         for(Body *body : bodies){
-            if(this != body){
+            if(bodyName_ != body->bodyName_){
               acceleration_ = force + GravityForcePerMass(body);
             }
         }
@@ -151,14 +151,21 @@ class Body{
         angular_position_ += angular_velocity_ * dt;
     } 
      //aproximated initial velocity
-      void VectorItitialVelocity(const Body *sun){
-      double a = (Perihelion_ + Aphelion_)/2;
-      Vector2Elm force(0,0);
-      Vector2Elm accel;
-      accel = force + GravityForcePerMass(sun);
-      velocity_.x_= sqrt(0);
-      velocity_.y_= sqrt(accel.abs()*a);
+      void VectorItitialVelocity(const Body *sun){ 
+          if(bodyName_ == sun->bodyName_){return;}    
+          double a = (Perihelion_ + Aphelion_)/2;
+          Vector2Elm force(0,0);
+          Vector2Elm accel;
+          accel = force + GravityForcePerMass(sun);
+          velocity_.x_= sqrt(0);
+          velocity_.y_= sqrt(accel.abs()*a);
      }
+      void TangentialVelocity(){
+          double a = (Perihelion_ + Aphelion_)/2;
+          velocity_.x_= sqrt(0);
+          velocity_.y_= sqrt(acceleration_.abs()*a);
+        
+      }
 
     private:
     Vector2Elm position_;
@@ -175,57 +182,66 @@ class Body{
 
 #endif
 
-int main(){
-    Vector2Elm a(1,5);
-    Vector2Elm b(2,2);
-    double c = 10;
-    Vector2Elm d = a*b;
-    Vector2Elm e;
-    e = a*c;
-    double f = a^b;
-    Vector2Elm g = a+b;
-    Vector2Elm h= a-b;
-    Vector2Elm i{2,2};
-    i = {3, 3};
-    double j = i.abs();
-    std::cout <<"("<< a.x_ <<","<<a.y_<<") * "<<"("<< b.x_ <<","<<b.y_<<")"<<" is "<<"("<< d.x_ <<","<<d.y_<<") \n";
-    std::cout <<"("<< a.x_ <<","<<a.y_<<") * "<< c <<" is "<<"("<< e.x_ <<","<<e.y_<<") \n";
-    std::cout <<"("<< a.x_ <<","<<a.y_<<") # "<<"("<< b.x_ <<","<<b.y_<<")"<<" is "<< f<<"\n";;
-    std::cout <<"("<< a.x_ <<","<<a.y_<<") + "<<"("<< b.x_ <<","<<b.y_<<")"<<" is "<<"("<< g.x_ <<","<<g.y_<<") \n";
-    std::cout <<"("<< a.x_ <<","<<a.y_<<") - "<<"("<< b.x_ <<","<<b.y_<<")"<<" is "<<"("<< h.x_ <<","<<h.y_<<") \n";
-    std::cout <<"("<< i.x_ <<","<<i.y_<<")\n";
-    std::cout << j << "\n";
-    
-    //Body earth;
-    //Body earth({152.1e9,0},{0,100000},{0,0},0.,0., 5.97e24,0.,"Earth", 152.1e9 , 152.1e9); //147.1e9
-    Body earth({1,0},{0,0},{0,0},0.,0., 5.97e24,0.,"Earth", 1 , 1); //147.1e9
-    //Body sun({0,0},{0,0},{0,0},0.,0.,1.989e30,0.,"Sun",0.,0.);
-    Body sun({0,0},{0,0},{0,0},0.,0.,1,0.,"Sun",0.,0.);
-    std::vector<Body*> solar_system;
-    solar_system.push_back(&earth);
-    solar_system.push_back(&sun);
-    earth.VectorItitialVelocity(&sun);
-    double dt = 1;
-    long long year = sqrt(4 * 3.1415*3.1415/6.67/1.989*pow(152.1,3.0))*1e4/dt;
-    std::cout <<"year : " <<year<<"\n";
-    for(long long i = 0; i <= year; i++){
-        earth.UpdateAcceleration(solar_system);
-        //sun.UpdateAcceleration(solar_system);
-        if(i==0){
-        earth.UpdateVelocity(dt/2);
-        //sun.UpdateVelocity(dt/2);
-        }else{
-        earth.UpdateVelocity(dt);
-
+int main(){    
+    std::ifstream filestream("./planets.txt");
+    std::string line;
+    int numlines = 0;
+    std::vector<Body*>solar_system;
+    if (filestream.is_open()){
+        while (std::getline(filestream, line)){
+            numlines +=1;
+            if(numlines >1){
+                
+                Vector2Elm pos, vel, accel;
+                double ang_pos, ang_vel, mass, J, perihl, aphl;
+                std::string name;
+                std::istringstream strstream(line);
+                while(strstream >> pos.x_>> pos.y_ >> vel.x_ >> vel.y_ >> accel.x_ >> accel.y_ >> ang_pos >> ang_vel >> mass >> J >> name >> perihl >> aphl){
+                Body *b = new Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl);
+                solar_system.emplace_back(b);
+                std::cout<< numlines <<"\n";
+                }
+            }
         }
-        earth.UpdatePosition(dt);
-        sun.UpdatePosition(dt);
-        if(i == 0 || i == year/4 || i == year/2 || i ==year*3/4 || i ==year  ){
-        std::cout<<std::setprecision(5)<<"pos: (" << earth.GetPosition().x_<< ", " <<earth.GetPosition().y_<<", "<<earth.GetPosition().abs()<<")"
-        << " vel :("<< earth.GetVelocity().x_<< ", " <<earth.GetVelocity().y_<<", "<<earth.GetVelocity().abs()<<")"
-        << " accel :("<< earth.GetAcceleration().x_<< ", " <<earth.GetAcceleration().y_<<", "<<earth.GetAcceleration().abs()<<")\n";
-        }
-        
     }
     
+    for(Body *body : solar_system){
+        std::cout<< body->GetPosition().x_<<" "<< body->GetPosition().y_ <<"\n";
+        std::cout<< body->GetVelocity().x_<<" "<< body->GetVelocity().y_ <<"\n";
+        std::cout<< body->GetAcceleration().x_<<" "<< body->GetAcceleration().y_ <<"\n";
+        std::cout<< body->GetAngularPosition() <<"\n";
+        std::cout<< body->GetAngularVelocity() <<"\n";
+        std::cout<< body->GetMass() <<"\n";
+        std::cout<< body->GetMomentInertia() <<"\n";
+        std::cout<< body->GetName() <<"\n"; 
+        //body->VectorItitialVelocity(solar_system[10]);
+    }
+    double dt = 10;
+    long long year = sqrt(4 * 3.1415*3.1415/6.67/1.989*pow(159.6,3.0)*1e8)/dt;
+    year = 3600*24*366/10;
+    for(long long i = 0; i <= year; i++){
+        for(Body *body : solar_system){
+            body->UpdateAcceleration(solar_system);
+            if(i==0){
+                body->TangentialVelocity();
+                body->UpdateVelocity(dt/2);
+            }else{
+                body->UpdateVelocity(dt);
+            }
+        }
+        for(Body *body : solar_system){
+            if(body->GetName()!="SUN"){
+            body->UpdatePosition(dt);}
+        
+            if((i == 0 || i == year/4 || i == year/2 || i ==year*3/4 || i ==year) && (body->GetName()=="EARTH")  ){
+                std::cout<<std::setprecision(5)<<"pos: (" << body->GetPosition().x_<< ", " <<body->GetPosition().y_<<", "<<body->GetPosition().abs()<<")"
+                << " vel :("<< body->GetVelocity().x_<< ", " <<body->GetVelocity().y_<<", "<<body->GetVelocity().abs()<<")"
+                << " accel :("<< body->GetAcceleration().x_<< ", " <<body->GetAcceleration().y_<<", "<<body->GetAcceleration().abs()<<")\n";
+            }
+        }    
+    }
+    for(Body *body : solar_system){
+        delete body;
+    }
+
 }
