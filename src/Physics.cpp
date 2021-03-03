@@ -7,6 +7,7 @@
 #include <exception>
 #include <iomanip>
 #include <fstream>
+#include <memory>
 class Vector2Elm
 {
     public:
@@ -133,11 +134,11 @@ class Body{
         Vector2Elm deltaPosition = b->position_- position_;
         return (deltaPosition)/pow(deltaPosition.abs(), 3.0)*(GravitationalConst * b->mass_);
     }
-        void UpdateAcceleration(std::vector<Body*> &bodies){
+        void UpdateAcceleration(std::vector<std::shared_ptr<Body>> *bodies){
         Vector2Elm force(0,0);
-        for(Body *body : bodies){
-            if(bodyName_ != body->bodyName_){
-              acceleration_ = force + GravityForcePerMass(body);
+        for(auto body = bodies->begin(); body != bodies->end(); body++){
+            if(bodyName_ != (**body).bodyName_){
+              acceleration_ = force + GravityForcePerMass((*body).get());
             }
         }
     }
@@ -166,6 +167,13 @@ class Body{
           velocity_.y_= sqrt(acceleration_.abs()*a);
         
       }
+    void PrintBody(){
+                std::cout<<"The " << GetName() << "\nposition is : (";
+                std::cout<< GetPosition().x_<<", "<< GetPosition().y_ <<"\nvelocity is :(";
+                std::cout<< GetVelocity().x_<<", "<< GetVelocity().y_ <<"\nacceleration is: (";
+                std::cout<< GetAcceleration().x_<<" "<< GetAcceleration().y_ <<")\n";
+            //body->VectorItitialVelocity(solar_system[10]);
+    }
 
     private:
     Vector2Elm position_;
@@ -180,68 +188,89 @@ class Body{
     double Aphelion_; 
 };
 
+class SolarSystem{
+    public:
+    SolarSystem(){
+    };
+    void AddBody(std::unique_ptr<Body> body){
+        bodies_.emplace_back(std::move(body));
+    }
+    void Update(const double dt){
+        for(auto body = bodies_.begin(); body != bodies_.end(); body++){
+            (**body).UpdateAcceleration(&bodies_);
+            if(is_start){
+            (**body).TangentialVelocity();
+            (**body).UpdateVelocity(dt/2);
+            is_start = false;
+            }else{
+            (**body).UpdateVelocity(dt);
+            }
+        }
+        for(auto body = bodies_.begin(); body != bodies_.end(); body++){
+            if((**body).GetName()!="SUN"){
+                (**body).UpdatePosition(dt);
+            }
+        }
+    }
+    void PrintBody(int id){
+        if(id >= bodies_.size()){
+            std::cerr << "The maximum id is " << bodies_.size()-1 << "\n"; 
+        }else{
+        bodies_[id]->PrintBody();
+        }        
+    }
+
+    private:
+    std::vector<std::shared_ptr<Body>> bodies_;
+    bool is_start = true;
+};
+
 #endif
 
-int main(){    
+bool CreateSolarSystem(SolarSystem &solar_system){
     std::ifstream filestream("./planets.txt");
     std::string line;
     int numlines = 0;
-    std::vector<Body*>solar_system;
+    bool is_imported = true;
     if (filestream.is_open()){
         while (std::getline(filestream, line)){
             numlines +=1;
             if(numlines >1){
-                
                 Vector2Elm pos, vel, accel;
                 double ang_pos, ang_vel, mass, J, perihl, aphl;
                 std::string name;
                 std::istringstream strstream(line);
-                while(strstream >> pos.x_>> pos.y_ >> vel.x_ >> vel.y_ >> accel.x_ >> accel.y_ >> ang_pos >> ang_vel >> mass >> J >> name >> perihl >> aphl){
-                Body *b = new Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl);
-                solar_system.emplace_back(b);
-                std::cout<< numlines <<"\n";
+                if(strstream >> pos.x_>> pos.y_ >> vel.x_ >> vel.y_ >> accel.x_ >> accel.y_ >> ang_pos >> ang_vel >> mass >> J >> name >> perihl >> aphl){
+                    std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl));
+                    solar_system.AddBody(std::move(b));
+                    std::cout<< numlines <<"\n";
+                    is_imported = is_imported && true;
+                }else{
+                    std::cerr << "Cannot load the planets data!"<<"\n";
+                    is_imported = false;
                 }
             }
         }
     }
-    
-    for(Body *body : solar_system){
-        std::cout<< body->GetPosition().x_<<" "<< body->GetPosition().y_ <<"\n";
-        std::cout<< body->GetVelocity().x_<<" "<< body->GetVelocity().y_ <<"\n";
-        std::cout<< body->GetAcceleration().x_<<" "<< body->GetAcceleration().y_ <<"\n";
-        std::cout<< body->GetAngularPosition() <<"\n";
-        std::cout<< body->GetAngularVelocity() <<"\n";
-        std::cout<< body->GetMass() <<"\n";
-        std::cout<< body->GetMomentInertia() <<"\n";
-        std::cout<< body->GetName() <<"\n"; 
-        //body->VectorItitialVelocity(solar_system[10]);
-    }
-    double dt = 10;
-    long long year = sqrt(4 * 3.1415*3.1415/6.67/1.989*pow(159.6,3.0)*1e8)/dt;
-    year = 3600*24*366/10;
-    for(long long i = 0; i <= year; i++){
-        for(Body *body : solar_system){
-            body->UpdateAcceleration(solar_system);
-            if(i==0){
-                body->TangentialVelocity();
-                body->UpdateVelocity(dt/2);
-            }else{
-                body->UpdateVelocity(dt);
-            }
-        }
-        for(Body *body : solar_system){
-            if(body->GetName()!="SUN"){
-            body->UpdatePosition(dt);}
-        
-            if((i == 0 || i == year/4 || i == year/2 || i ==year*3/4 || i ==year) && (body->GetName()=="EARTH")  ){
-                std::cout<<std::setprecision(5)<<"pos: (" << body->GetPosition().x_<< ", " <<body->GetPosition().y_<<", "<<body->GetPosition().abs()<<")"
-                << " vel :("<< body->GetVelocity().x_<< ", " <<body->GetVelocity().y_<<", "<<body->GetVelocity().abs()<<")"
-                << " accel :("<< body->GetAcceleration().x_<< ", " <<body->GetAcceleration().y_<<", "<<body->GetAcceleration().abs()<<")\n";
-            }
-        }    
-    }
-    for(Body *body : solar_system){
-        delete body;
-    }
-
+    return is_imported;
 }
+int main(){ 
+    SolarSystem solar_system;
+    bool import_success = true;
+    import_success = CreateSolarSystem(solar_system);
+    if(import_success){    
+        double dt = 10;
+        long long year = sqrt(4 * 3.1415*3.1415/6.67/1.989*pow(159.6,3.0)*1e8)/dt;
+        year = 3600*24*366/10;
+        for(long long i = 0; i <= year; i++){
+            solar_system.Update(dt);
+            if((i == 0 || i == year/4 || i == year/2 || i ==year*3/4 || i ==year)){
+                solar_system.PrintBody(0);
+            }
+  
+        }
+    }
+}
+
+     
+    
