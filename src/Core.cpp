@@ -61,20 +61,13 @@ class Core{
             }
         }
     }    
-    void End(){
-        if(texture_ != nullptr){
-            SDL_DestroyTexture( texture_ );
-            texture_ = nullptr;
-            std::cout << "Texture destroyed.\n";
-        }
-
-        if(sdl_renderer_ != nullptr){
+    
+    void EndGraphics(){
+            if(sdl_renderer_ != nullptr){
             SDL_DestroyRenderer( sdl_renderer_ );
             sdl_renderer_ = nullptr;
             std::cout << "Texture destroyed.\n";
         }
-
-
         if(sdl_window_ != nullptr){
             SDL_DestroyWindow(sdl_window_);
             std::cout << "Window destroyed.\n";    
@@ -84,7 +77,9 @@ class Core{
 
         std::cout << "Quit SDL.\n";
         SDL_Quit();
+
     }
+
     void Renderer(){
 		SDL_RenderPresent( sdl_renderer_ );
 	}
@@ -176,6 +171,15 @@ class Textures{
 		SDL_FreeSurface( loadedSurface );
         //Clear screen
      }
+     void EndTexture(){
+            if(texture_ != nullptr){
+                SDL_DestroyTexture( texture_ );
+                texture_ = nullptr;
+                std::cout << "Texture destroyed.\n";
+
+        }
+
+     }
     private:
     static Textures *textures_;
     SDL_Rect rectangle_;
@@ -195,7 +199,8 @@ int main(){
         Core::GetCore()->Renderer();
         Core::GetCore()->EventHandler();
     }
-    Core::GetCore()->End();
+    Textures::GetTextures()->EndTexture();
+    Core::GetCore()->EndGraphics();
     Core::FreeCore();
 }
 
