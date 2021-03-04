@@ -191,7 +191,15 @@ class Body{
 
 class SolarSystem{
     public:
-    SolarSystem(){
+    static SolarSystem* GetSolarSystem(){
+        if(solar_system_ ==nullptr){
+            solar_system_ = new SolarSystem();
+            return solar_system_;
+        }else{
+            return solar_system_;
+        }
+    }
+    void ImportData(){
         std::ifstream filestream("./planets.txt");
         std::string line;
         int numlines = 0;
@@ -218,6 +226,7 @@ class SolarSystem{
             CenterOfMass();
         }
     }
+
     void AddBody(std::unique_ptr<Body> body){
         bodies_.emplace_back(std::move(body));
     }
@@ -261,9 +270,14 @@ class SolarSystem{
         position_ = position_/totalMass_;
     }
     double GetTotalMass(){return totalMass_;}
+
     Vector2Elm GetPosition(){return position_;}
+
     bool GetIsImported(){return is_imported_;}
+
     private:
+    SolarSystem(){}
+    static SolarSystem* solar_system_;
     std::vector<std::shared_ptr<Body>> bodies_;
     bool is_start = true;
     Vector2Elm position_;
@@ -273,21 +287,20 @@ class SolarSystem{
 
 #endif
 
-
-int main(){ 
-    SolarSystem solar_system;
-    std::cout<< "Total Mass of solar system is: " << solar_system.GetTotalMass() <<"\n";
-    std::cout<< "("<<solar_system.GetPosition().x_<<", " << solar_system.GetPosition().y_<<")\n";
-    if(solar_system.GetIsImported()){    
+SolarSystem * SolarSystem::solar_system_ = nullptr;
+int main(){   
+    SolarSystem::GetSolarSystem()->ImportData();
+    std::cout<< "Total Mass of solar system is: " << SolarSystem::GetSolarSystem()->GetTotalMass() <<"\n";
+    std::cout<< "("<<SolarSystem::GetSolarSystem()->GetPosition().x_<<", " << SolarSystem::GetSolarSystem()->GetPosition().y_<<")\n";
+    if(SolarSystem::GetSolarSystem()->GetIsImported()){    
         double dt = 10;
         long long year = sqrt(4 * 3.1415*3.1415/6.67/1.989*pow(159.6,3.0)*1e8)/dt;
         year = 3600*24*366/10;
         for(long long i = 0; i <= year; i++){
-            solar_system.Update(dt);
+            SolarSystem::GetSolarSystem()->Update(dt);
             if((i == 0 || i == year/4 || i == year/2 || i ==year*3/4 || i ==year)){
-                solar_system.PrintBody(0);
+                SolarSystem::GetSolarSystem()->PrintBody(2);
             }
-  
         }    
     }
 }
