@@ -86,72 +86,11 @@ class Core{
         SDL_Quit();
     }
     void Renderer(){
-        if(texture_ != nullptr){
-            SDL_DestroyTexture( texture_ );
-        texture_ = nullptr;
-        }
-	    //Load PNG image
-        std::string path = "../image/EARTH2.png";
-	    SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-	    if( loadedSurface == NULL )
-	    {
-		    std::cerr<< "Image " << path.c_str() << " not loaded! SDL_image Error: "<< IMG_GetError()<<"\n";
-            success_ = false;
-	    }else{
-            //Set a color to be transparent
-		    SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 119, 236, 255 ) );
-
-        	//Create texture from surface pixels
-            texture_ = SDL_CreateTextureFromSurface( sdl_renderer_, loadedSurface );
-	        if( texture_ == nullptr )
-	        {
-               std::cerr<< "Texture from Image " << path.c_str() << " not created! SDL_image Error: "<< IMG_GetError()<<"\n";
-               success_ = false;
-	        }
-        }
-		//Delete loaded surface
-		SDL_FreeSurface( loadedSurface );
-        //Clear screen
-		SDL_RenderClear( sdl_renderer_ );
-        //Set rendering space and render to screen
-	    SDL_Rect imageQuad = { 0, 0, 600, 600 };
-        SDL_Rect renderQuad = { 0, 0, 300, 300 };
-        //Render texture to screen
-		SDL_RenderCopy( sdl_renderer_, texture_, NULL, &renderQuad );
-        
-        /*//Modulate color rgb
-           Uint8 red = 0, green = 65, blue = 30;
-	       if(SDL_SetTextureColorMod( texture_, red, green, blue ) < 0){
-               std::cerr<<"Color modulation not suported! SDL Error: " << SDL_GetError()<<"\n";
-           }else{
-               Uint8 *pred, *pgreen, *pblue; 
-               SDL_GetTextureColorMod( texture_, pred, pgreen, pblue );
-               std::cout<<"Modulation of: "<< *pred <<", "<< *pgreen <<", "<< *pblue <<", "<< "\n";
-           }*/
-
-           /*//Set blending function
-           SDL_BlendMode blendMode = SDL_BLENDMODE_BLEND; //NONE, ADD, BLEND, MOD
-	       if(SDL_SetTextureBlendMode( texture_, blendMode )<0){
-               std::cerr<<"Blending not suported! SDL Error: " << SDL_GetError()<<"\n";
-           }else{
-               SDL_BlendMode *pblendMode;
-               SDL_GetTextureBlendMode( texture_, pblendMode );
-               std::cout<<"Blend Mode: "<< *pblendMode <<", "<< "\n";
-           }
-	       //Modulate opacity (alpha)
-           Uint8 alpha = 100;
-	       if(SDL_SetTextureAlphaMod( texture_, alpha )<0){
-               std::cerr<<"AlphaMod not suported! SDL Error: " << SDL_GetError()<<"\n";
-           }else{
-               Uint8 *palpha;
-               SDL_GetTextureAlphaMod( texture_, palpha );
-               std::cout<<"Blend Mode: "<< *palpha <<", "<< "\n";
-           }*/
-
-
-		//Update screen
 		SDL_RenderPresent( sdl_renderer_ );
 	}
+    void ClearRenderer(){
+        SDL_RenderClear( sdl_renderer_ );
+    }
     void EventHandler(){
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
@@ -168,6 +107,7 @@ class Core{
     }
 
     bool GetStatus(){return success_;}
+    SDL_Renderer * GetRenderer(){return sdl_renderer_;}
     private:
     Core(){};
     static Core *core_;
@@ -181,11 +121,77 @@ class Core{
 };
 #endif
 
+#ifndef TEXTURES.H
+#define TEXTURES.H
+
+//#include <iostream>
+//#include "SDL2/SDL.h"
+//#include "SDL2/SDL_image.h"
+
+
+class Textures{
+    public:
+     static Textures *GetTextures(){
+        if(textures_ == nullptr){
+            textures_= new Textures(); 
+            std::cout<<"Textures Started\n"; 
+            return textures_;
+        }
+        return textures_;
+    }        
+    static void FreeTextures(){
+        std::cout<<"Textures Ended\n";
+        delete textures_;
+    }
+     void TextureFromImageLoad(std::string filename){
+		//Update screen 
+        if(texture_ != nullptr){
+            SDL_DestroyTexture( texture_ );
+        texture_ = nullptr;
+        }
+	    //Load PNG image
+	    SDL_Surface* loadedSurface = IMG_Load(filename.c_str() );
+	    if( loadedSurface == NULL )
+	    {
+		    std::cerr<< "Image " << filename.c_str() << " not loaded! SDL_image Error: "<< IMG_GetError()<<"\n";
+            success_ = false;
+	    }else{
+            //Set a color to be transparent
+		    SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 119, 236, 255 ) );
+
+        	//Create texture from surface pixels
+            texture_ = SDL_CreateTextureFromSurface( Core::GetCore()->GetRenderer(), loadedSurface );
+	        if( texture_ == nullptr )
+	        {
+               std::cerr<< "Texture from Image " << filename.c_str() << " not created! SDL_image Error: "<< IMG_GetError()<<"\n";
+               success_ = false;
+	        }
+            //Set rendering space and render to screen
+	        SDL_Rect imageRect = { 0, 0, 600, 600 };
+            SDL_Rect renderRect = { 0, 0, 300, 300 };
+            //Render texture to screen
+		    SDL_RenderCopy( Core::GetCore()->GetRenderer(), texture_, &imageRect, &renderRect );
+        }
+		//Delete loaded surface
+		SDL_FreeSurface( loadedSurface );
+        //Clear screen
+     }
+    private:
+    static Textures *textures_;
+    SDL_Rect rectangle_;
+    SDL_Texture *texture_=nullptr;
+    bool success_ = true;
+};
+#endif
+
 Core* Core::core_= nullptr;
+Textures* Textures::textures_=nullptr;
 int main(){
     Core::GetCore();
     Core::GetCore()->Start();
     while(Core::GetCore()->GetStatus()){
+        Core::GetCore()->ClearRenderer();
+        Textures::GetTextures()->TextureFromImageLoad("../image/EARTH1.png");
         Core::GetCore()->Renderer();
         Core::GetCore()->EventHandler();
     }
