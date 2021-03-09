@@ -101,7 +101,7 @@ Vector2Elm Vector2Elm::operator*(const Vector2Elm &&b) const {
 
 
 Vector2Elm Body::GravityForcePerMass(std::shared_ptr<Body> b){
-    const double GravitationalConst = 0.0000003929131713; 
+    const double GravitationalConst = 0.0000003929131713; //= GM/r3
     Vector2Elm deltaPosition = b->position_- position_;
     return (deltaPosition)/pow(deltaPosition.abs(), 3.0)*(GravitationalConst * b->mass_);
 }
@@ -162,11 +162,14 @@ void SolarSystem::ImportData(){
             numlines +=1;
             if(numlines >1){
                 Vector2Elm pos, vel, accel;
-                double ang_pos, ang_vel, mass, J, perihl, aphl;
+                double ang_pos, ang_vel, mass, J, perihl, aphl, diam;
                 std::string name;
                 std::istringstream strstream(line);
-                if(strstream >> pos.x_>> pos.y_ >> vel.x_ >> vel.y_ >> accel.x_ >> accel.y_ >> ang_pos >> ang_vel >> mass >> J >> name >> perihl >> aphl){
+                if(strstream  >> name >> perihl >> aphl>> diam >> mass >> ang_vel){
+                    pos = {0,0};
                     vel = {0,0};
+                    accel = {0,0};
+                    J = 2/5*mass*pow(diam/2,2);
                     if(name == "MOON"){
                         pos = pos  +  (bodies_[bodies_.size()-1])->GetPosition();
                         std::cout << pos.x_ << " " << pos.y_ <<"\n";

@@ -169,9 +169,7 @@ class SolarSystem{
 
     std::shared_ptr<Body> GetBody(int id){return bodies_.at(id);}
 
-    std::string BodyName(int id){return bodies_.at(id)->GetName();}
-   
-    //void InitialVelocityEarthMoon();
+    std::string BodyName(int id){return bodies_.at(id)->GetName();}   
 
     void InitialConditions();
    
