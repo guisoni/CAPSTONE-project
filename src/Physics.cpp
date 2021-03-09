@@ -174,7 +174,7 @@ void SolarSystem::ImportData(){
                         pos = pos  +  (bodies_[bodies_.size()-1])->GetPosition();
                         std::cout << pos.x_ << " " << pos.y_ <<"\n";
                     }
-                    std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl));
+                    std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl,diam));
                     AddBody(std::move(b));
                     std::cout<< numlines <<"\n";
                     is_imported_ = is_imported && true;

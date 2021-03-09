@@ -24,6 +24,7 @@ namespace AuxMath{
     }
 
 }
+
 class Vector2Elm
 {
     public:
@@ -98,9 +99,10 @@ class Body{
          mass_moment_Inertia_{0.},
          bodyName_{""},
          Perihelion_{0.},
-         Aphelion_{0.}{}
+         Aphelion_{0.},
+         diameter_{0.}{}
 
-    Body(Vector2Elm pos, Vector2Elm vel, Vector2Elm accel, double ang_pos, double ang_vel, double mass, double J, std::string body_name, double perihl, double aphl ) : position_{pos}, velocity_{vel}, acceleration_{accel}, angular_position_{ang_pos},angular_velocity_{ang_vel}, mass_{mass}, mass_moment_Inertia_{J}, bodyName_{body_name}, Perihelion_{perihl}, Aphelion_{aphl} {}    
+    Body(Vector2Elm pos, Vector2Elm vel, Vector2Elm accel, double ang_pos, double ang_vel, double mass, double J, std::string body_name, double perihl, double aphl, double diam ) : position_{pos}, velocity_{vel}, acceleration_{accel}, angular_position_{ang_pos},angular_velocity_{ang_vel}, mass_{mass}, mass_moment_Inertia_{J}, bodyName_{body_name}, Perihelion_{perihl}, Aphelion_{aphl},diameter_{diam} {}    
     Vector2Elm GetPosition(){return position_;}
     Vector2Elm GetVelocity(){return velocity_;}
     Vector2Elm GetAcceleration(){return acceleration_;}
@@ -109,6 +111,7 @@ class Body{
     double GetMass(){return mass_;}
     double GetMomentInertia(){return mass_moment_Inertia_;}
     std::string GetName(){return bodyName_;}
+    double GetDiameter(){return diameter_;}
 
     Vector2Elm GravityForcePerMass(std::shared_ptr<Body> b);
 
@@ -139,7 +142,8 @@ class Body{
     double mass_moment_Inertia_;
     std::string bodyName_;
     double Perihelion_;
-    double Aphelion_; 
+    double Aphelion_;
+    double diameter_; 
     friend class SolarSystem;
 };
 

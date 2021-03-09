@@ -17,7 +17,7 @@ int main(){
         Core::GetCore();
         Core::GetCore()->Start(); 
         double dt = 100;
-        Core::GetCore()->RunGame(dt);
+        Core::GetCore()->RunGame();
         Core::GetCore()->EndGraphics();
         Core::FreeCore();
     }

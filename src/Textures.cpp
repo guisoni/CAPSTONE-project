@@ -24,7 +24,11 @@ void Textures::AddTexture(){
         texture_.emplace_back(nullptr);
 }
 
-void Textures::TextureFromImageLoad(int index, std::string filename, const SDL_Rect *source, const  SDL_Rect *dest){
+void Textures::AddScaleFactor(const int &refmeasure, const double &Diam){
+        scale_texture_.push_back(Diam/refmeasure*0.99633333333);
+}
+
+void Textures::TextureFromImageLoad(int index, std::string filename){
 	//Update screen 
     if(texture_.at(index) != nullptr){
         SDL_DestroyTexture( texture_.at(index) );
@@ -57,6 +61,7 @@ void Textures::TextureFromImageLoad(int index, std::string filename, const SDL_R
 void Textures::Draw(int index, SDL_Rect *source,SDL_Rect *dest){
             //Render texture to screen
 		SDL_RenderCopy( Core::GetCore()->GetRenderer(), texture_.at(index), source, dest);
+        
 }
 
 void Textures::EndTexture(int index){
@@ -67,5 +72,15 @@ void Textures::EndTexture(int index){
 
     }
 }
+
+int Textures::GetTextureSize(int id, SDL_Rect &textRect){
+    Uint32 format;
+    int access;
+    int testing;
+    testing = SDL_QueryTexture(texture_[id],&format, &access, &textRect.w, &textRect.h);
+    return testing; 
+}
+
+
 
 
