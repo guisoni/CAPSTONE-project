@@ -12,21 +12,12 @@ int main(){
     SolarSystem::GetSolarSystem()->ImportData();
     
     if(SolarSystem::GetSolarSystem()->GetIsImported()){   
-        std::cout<< "Total Mass of solar system is: " << SolarSystem::GetSolarSystem()->GetTotalMass() <<"\n";
-        std::cout<< "("<<SolarSystem::GetSolarSystem()->GetPosition().x_<<", " << SolarSystem::GetSolarSystem()->GetPosition().y_<<")\n";
+        //std::cout<< "Total Mass of solar system is: " << SolarSystem::GetSolarSystem()->GetTotalMass() <<"\n";
+        //std::cout<< "("<<SolarSystem::GetSolarSystem()->GetPosition().x_<<", " << SolarSystem::GetSolarSystem()->GetPosition().y_<<")\n";
         Core::GetCore();
         Core::GetCore()->Start(); 
-        double dt = 10;
-        while(Core::GetCore()->GetStatus()){
-            Core::GetCore()->ClearRenderer();
-            Textures::GetTextures()->TextureFromImageLoad("../image/EARTH1.png");
-            Core::GetCore()->Renderer();
-            Core::GetCore()->EventHandler();
-            
-            SolarSystem::GetSolarSystem()->Update(dt);
-            SolarSystem::GetSolarSystem()->PrintBody(2);
-        }
-        Textures::GetTextures()->EndTexture();
+        double dt = 100;
+        Core::GetCore()->RunGame(dt);
         Core::GetCore()->EndGraphics();
         Core::FreeCore();
     }

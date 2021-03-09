@@ -2,6 +2,8 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "Core.h"
+#include "Physics.h"
+#include "Textures.h"
 
 Core *Core::GetCore(){
     if(core_ == nullptr){
@@ -29,8 +31,8 @@ void Core::Start(){
         std::cout << "SDL initialized.\n";
         // Create Window
         sdl_window_ = SDL_CreateWindow("Snake Game", SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, screen_width,
-        screen_height, SDL_WINDOW_SHOWN);
+        SDL_WINDOWPOS_CENTERED, screen_width_,
+        screen_height_, SDL_WINDOW_SHOWN);
         if (sdl_window_==nullptr) {
             std::cerr << "Window could not be created.\n";
             std::cerr << " SDL_Error: " << SDL_GetError() << "\n";
@@ -59,6 +61,56 @@ void Core::Start(){
     }
 }    
     
+void Core::RunGame(double dt){
+    
+    for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
+        Textures::GetTextures()->AddTexture();
+        std::string filename = SolarSystem::GetSolarSystem()->GetBody(index)->GetName();
+        SDL_Point position;
+        int width = 60;
+        int height = 60;
+        position.x = static_cast<int>(screen_width_/2+SolarSystem::GetSolarSystem()->GetBody(index)->GetPosition().x_-width/2);
+        position.y = static_cast<int>(screen_height_/2-SolarSystem::GetSolarSystem()->GetBody(index)->GetPosition().y_+height/2);
+        SDL_Rect source = {position.x,position.y,width,height};
+        SDL_Rect dest = source;
+        Textures::GetTextures()->TextureFromImageLoad(index,"../image/" + filename + ".png", NULL, &dest);
+    }
+    int count = 0;
+    
+    while(Core::GetCore()->GetStatus()){
+        count++;
+        Core::GetCore()->ClearRenderer();
+        if(count == 100){
+        for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
+            SDL_Point pixelposition;
+            int width = 60;
+            int height = 60;
+            Vector2Elm position;
+            position = SolarSystem::GetSolarSystem()->GetBody(index)->Transform(SolarSystem::GetSolarSystem()->GetBody(10));
+            position.LogarithmScale();
+            pixelposition.x = static_cast<int>(screen_width_/2 + position.x_*20-width/2);
+            pixelposition.y = static_cast<int>(screen_height_/2 - position.y_*20+height/2);
+
+            
+
+            //position.x = static_cast<int>(screen_width_/2+SolarSystem::GetSolarSystem()->GetBody(index)->GetPosition().x_-width/2);
+            //position.y = static_cast<int>(screen_height_/2-SolarSystem::GetSolarSystem()->GetBody(index)->GetPosition().y_+height/2);
+            SDL_Rect source = {pixelposition.x,pixelposition.y,width,height};
+            SDL_Rect dest = source;
+            Textures::GetTextures()->Draw(index,NULL, &dest);
+            count = 0;
+        }
+        
+        Core::GetCore()->Renderer();
+        }
+        Core::GetCore()->EventHandler();  
+        SolarSystem::GetSolarSystem()->Update(dt);
+        //SolarSystem::GetSolarSystem()->PrintBody(2);
+    }
+    for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
+        Textures::GetTextures()->EndTexture(index);
+    }
+}
 void Core::EndGraphics(){
     if(sdl_renderer_ != nullptr){
         SDL_DestroyRenderer( sdl_renderer_ );

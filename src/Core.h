@@ -12,6 +12,8 @@ class Core{
 
     void Start();
     
+    void RunGame(double dt);
+
     void EndGraphics();
 
     void Renderer();
@@ -30,8 +32,8 @@ class Core{
     SDL_Window* sdl_window_ = nullptr;
     SDL_Renderer* sdl_renderer_ = nullptr;
     SDL_Texture* texture_= nullptr;
-    size_t screen_width{1820};
-    size_t screen_height{780};
+    int screen_width_{1820};
+    int screen_height_{780};
     
 };
 #endif

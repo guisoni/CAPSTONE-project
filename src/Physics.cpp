@@ -6,6 +6,7 @@
 #include <fstream>
 #include <memory>
 #include <numeric>
+#include <random>
 #include "Physics.h"
     
 //this + Vector2Elm
@@ -99,17 +100,17 @@ Vector2Elm Vector2Elm::operator*(const Vector2Elm &&b) const {
 
 
 
-Vector2Elm Body::GravityForcePerMass(const Body *b){
+Vector2Elm Body::GravityForcePerMass(std::shared_ptr<Body> b){
     const double GravitationalConst = 0.0000003929131713; 
     Vector2Elm deltaPosition = b->position_- position_;
     return (deltaPosition)/pow(deltaPosition.abs(), 3.0)*(GravitationalConst * b->mass_);
 }
 
 void Body::UpdateAcceleration(std::vector<std::shared_ptr<Body>> *bodies){
-    Vector2Elm force(0,0);
+    acceleration_ = {0,0};
     for(auto body = bodies->begin(); body != bodies->end(); body++){
         if(bodyName_ != (**body).bodyName_){
-          acceleration_ = force + GravityForcePerMass((*body).get());
+          acceleration_ = acceleration_ + GravityForcePerMass(*body);
         }
     }
 }
@@ -126,16 +127,7 @@ void Body::UpdateAngularPosition(const double &dt){
     angular_position_ += angular_velocity_ * dt;
 }
 
-//aproximated initial velocity
-void Body::VectorItitialVelocity(const Body *sun){ 
-    if(bodyName_ == sun->bodyName_){return;}    
-    double a = (Perihelion_ + Aphelion_)/2;
-    Vector2Elm force(0,0);
-    Vector2Elm accel;
-    accel = force + GravityForcePerMass(sun);
-    velocity_.x_= sqrt(0);
-    velocity_.y_= sqrt(accel.abs()*a);
-}
+
 void Body::TangentialVelocity(){
     double a = (Perihelion_ + Aphelion_)/2;
     velocity_.x_= sqrt(0);
@@ -143,13 +135,14 @@ void Body::TangentialVelocity(){
 }
 
 void Body::PrintBody(){
-    std::cout<<"The " << GetName() << "\nposition is : (";
-    std::cout<< GetPosition().x_<<", "<< GetPosition().y_ <<"\nvelocity is :(";
-    std::cout<< GetVelocity().x_<<", "<< GetVelocity().y_ <<"\nacceleration is: (";
-    std::cout<< GetAcceleration().x_<<" "<< GetAcceleration().y_ <<")\n";
-    //body->VectorItitialVelocity(solar_system[10]);
+    std::cout<< GetPosition().x_<<", "<< GetPosition().y_ <<"  ";//\nvelocity is :(";
+    std::cout<< GetVelocity().x_<<", "<< GetVelocity().y_ <<"\n";//acceleration is: (";
+    //std::cout<< GetAcceleration().x_<<" "<< GetAcceleration().y_ <<")\n";
 }
 
+Vector2Elm Body::Transform(std::shared_ptr<Body> b){
+    return position_ - b->position_;
+}
 
 SolarSystem* SolarSystem::GetSolarSystem(){
     if(solar_system_ ==nullptr){
@@ -173,6 +166,11 @@ void SolarSystem::ImportData(){
                 std::string name;
                 std::istringstream strstream(line);
                 if(strstream >> pos.x_>> pos.y_ >> vel.x_ >> vel.y_ >> accel.x_ >> accel.y_ >> ang_pos >> ang_vel >> mass >> J >> name >> perihl >> aphl){
+                    vel = {0,0};
+                    if(name == "MOON"){
+                        pos = pos  +  (bodies_[bodies_.size()-1])->GetPosition();
+                        std::cout << pos.x_ << " " << pos.y_ <<"\n";
+                    }
                     std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl));
                     AddBody(std::move(b));
                     std::cout<< numlines <<"\n";
@@ -191,18 +189,21 @@ void SolarSystem::AddBody(std::unique_ptr<Body> body){
     bodies_.emplace_back(std::move(body));
 }
 
+
 void SolarSystem::Update(const double dt){
+        if(is_start_){
+            SolarSystem::InitialConditions();
+        }
     for(auto body = bodies_.begin(); body != bodies_.end(); body++){
         (**body).UpdateAcceleration(&bodies_);
-        if(is_start){
-        (**body).TangentialVelocity();
-        (**body).UpdateVelocity(dt/2);
-        is_start = false;
-        }else{
-        (**body).UpdateVelocity(dt);
-        }
     }
     for(auto body = bodies_.begin(); body != bodies_.end(); body++){
+        if(is_start_){
+            (**body).UpdateVelocity(dt/2);
+        }else{
+            (**body).UpdateVelocity(dt);
+        }
+        is_start_ = false;
         if((**body).GetName()!="SUN"){
             (**body).UpdatePosition(dt);
         }
@@ -219,18 +220,110 @@ void SolarSystem::PrintBody(int id){
 
 void SolarSystem::TotalMass(){
     for(auto body = bodies_.begin(); body != bodies_.end(); body++){
-        totalMass_ +=(**body).GetMass();
+        totalMass_ +=(**body).mass_;
     }
 }
+
 
 void SolarSystem::CenterOfMass(){
     TotalMass();
     position_ = {0,0};
     for(auto body = bodies_.begin(); body != bodies_.end(); body++){
-            position_= ((**body).GetPosition()*(**body).GetMass());
-        }
-        position_ = position_/totalMass_;
+        position_= position_+ ((**body).position_*(**body).mass_);
     }
+    position_ = position_/totalMass_;
+}
+
+//initial velocity
+void SolarSystem::InitialConditions(){
+
+    {
+    //bodies_[2]->position_ = {bodies_[2]->Aphelion_,0};
+    double a = (bodies_[2]->Perihelion_+bodies_[2]->Aphelion_)/2;
+    double f = bodies_[2]->Aphelion_ - a;
+    double b = sqrt(a*a-f*f);
+    bodies_[3]->position_ = {f, b};
+    }
+    for(int i = 0; i < bodies_.size(); i++){
+        if(bodies_[i]->bodyName_ == "SUN"){
+            bodies_[i]->position_ = {0,0};
+        }
+        else if(bodies_[i]->bodyName_ == "EARTH"){
+            
+            double a = (bodies_[i]->Perihelion_+bodies_[i]->Aphelion_)/2;
+            double f = bodies_[i]->Aphelion_ - a;
+            double b = sqrt(a*a-f*f);
+            double c = (bodies_[i+1]->Perihelion_+ bodies_[i+1]->Aphelion_)/2;
+            double consta, constb, constc;
+            consta = -1/(a*a)+1/(b*b);
+            constb = 2*b/a/a;
+            constc =  pow(c/a,2)-pow(b/a,2)-1;
+            double delta = pow(constb,2)-4*consta*constc;
+            delta = (delta < 0)? 0 : delta;
+            bodies_[i]->position_.y_ = (-constb +sqrt(delta))/(2*consta);
+            delta = (1-(pow(bodies_[i]->position_.y_/b,2)));
+            delta = (delta < 0)? 0 : delta;
+            bodies_[i]->position_.x_ = sqrt(delta)*a+f;
+            
+        }else if(bodies_[i]->bodyName_ != "MOON"){
+            double a = (bodies_[i]->Perihelion_+bodies_[i]->Aphelion_)/2;
+            double f = bodies_[i]->Aphelion_ - a;;
+            double b = sqrt(a*a-f*f);
+            std::random_device rd;
+            std::mt19937 eng(rd());
+            std::uniform_real_distribution<> ddistr(-bodies_[i]->Perihelion_, std::nextafter(bodies_[i]->Aphelion_, std::numeric_limits<double>::max()));
+            bodies_[i]->position_.x_= ddistr(eng);
+            std::uniform_int_distribution<> idistr(0,1);
+            int signal =(idistr(eng) == 0)?  -1 : 1;
+            double ysquared = 1-(pow((bodies_[i]->position_.x_- f)/a,2.0));
+            if(ysquared < 0){
+                bodies_[i]->position_.y_ = signal *b;
+            }else{
+                bodies_[i]->position_.y_ = signal * sqrt(ysquared)*b;
+            }       
+        }
+    }
+
+    for(int i = 0; i < bodies_.size(); i++){
+        if(bodies_[i]->bodyName_ != "SUN"){
+            if(bodies_[i]->bodyName_ != "MOON"){
+                double a = (bodies_[i]->Perihelion_+bodies_[i]->Aphelion_)/2;
+                double f = bodies_[i]->Aphelion_ - a;
+                double b = sqrt(a*a-f*f);
+                double angle = atan(-(bodies_[i]->position_.x_-f)/(bodies_[i]->position_.y_)*b*b/(a*a));
+                Vector2Elm force(0,0);
+                Vector2Elm accel;
+                accel = force + bodies_[i]->GravityForcePerMass(bodies_[10]);
+                double r = (bodies_[i]->position_-bodies_[10]->position_).abs();
+                if(bodies_[i]->position_.y_ >= 0){
+                    bodies_[i]->velocity_.x_=  -sqrt(accel.abs()*(2*r - r*r/a))*cos(angle);
+                    bodies_[i]->velocity_.y_=  -sqrt(accel.abs()*(2*r - r*r/a))*sin(angle);  
+                }else{
+                    bodies_[i]->velocity_.x_=   sqrt(accel.abs()*(2*r - r*r/a))*cos(angle);
+                    bodies_[i]->velocity_.y_=   sqrt(accel.abs()*(2*r - r*r/a))*sin(angle);  
+                }            
+            }else{   
+                {
+                    double a = (bodies_[i]->Perihelion_+bodies_[i]->Aphelion_)/2;
+                    Vector2Elm force(0,0);
+                    Vector2Elm accel;
+                    accel = force + bodies_[i]->GravityForcePerMass(bodies_[i-1]);
+                    double r = (bodies_[i]->position_-bodies_[i-1]->position_).abs();
+                    bodies_[i]->velocity_.y_= -sqrt(accel.abs()*(2*r - r*r/a));   
+                }
+                double a = (bodies_[i-1]->Perihelion_+bodies_[i-1]->Aphelion_)/2;
+                Vector2Elm force(0,0);
+                Vector2Elm accel;
+                accel = force + bodies_[i]->GravityForcePerMass(bodies_[10]);
+                double r = (bodies_[i-1]->position_- bodies_[10]->position_).abs(); 
+                bodies_[i]->velocity_.x_-= sqrt(accel.abs()*(2*r - r*r/a));
+
+            }          
+        }
+        bodies_[i]->PrintBody();
+    }
+}
+
 
 
 

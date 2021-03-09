@@ -10,6 +10,20 @@
 #include <memory>
 #include <numeric>
 
+namespace AuxMath{
+    template <typename T>
+    T abs(T value){
+        return ((value >= 0) ? value :-value); 
+    }
+    template <typename T>
+    T sign(T value){
+        if(value !=0){
+            return value / abs(value);
+        }
+        return 1; 
+    }
+
+}
 class Vector2Elm
 {
     public:
@@ -55,9 +69,22 @@ class Vector2Elm
     
     double abs() const;
 
+    void LogarithmScale(){
+        double r = this->abs();
+        double logr = 0; 
+        if(r!= 0){
+          logr = log(AuxMath::abs<double>(r) + 1);
+          x_ *=  logr/r;
+          y_ *=  logr/r;
+        }
+
+
+    }
+    
     double x_;
     double y_;
 };
+
 
 class Body{
     public:
@@ -83,7 +110,7 @@ class Body{
     double GetMomentInertia(){return mass_moment_Inertia_;}
     std::string GetName(){return bodyName_;}
 
-    Vector2Elm GravityForcePerMass(const Body *b);
+    Vector2Elm GravityForcePerMass(std::shared_ptr<Body> b);
 
     void UpdateAcceleration(std::vector<std::shared_ptr<Body>> *bodies);
 
@@ -94,12 +121,13 @@ class Body{
     void UpdateAngularPosition(const double &dt);
 
      //aproximated initial velocity
-    void VectorItitialVelocity(const Body *sun);
+    void InitialVelocity(std::shared_ptr <Body> );
 
     void TangentialVelocity();
 
     void PrintBody();
 
+    Vector2Elm Transform(std::shared_ptr<Body> b);
 
     private:
     Vector2Elm position_;
@@ -112,6 +140,7 @@ class Body{
     std::string bodyName_;
     double Perihelion_;
     double Aphelion_; 
+    friend class SolarSystem;
 };
 
 class SolarSystem{
@@ -136,11 +165,21 @@ class SolarSystem{
 
     bool GetIsImported(){return is_imported_;}
 
+    int GetNumberOfBodies(){return bodies_.size();}
+
+    std::shared_ptr<Body> GetBody(int id){return bodies_.at(id);}
+
+    std::string BodyName(int id){return bodies_.at(id)->GetName();}
+   
+    //void InitialVelocityEarthMoon();
+
+    void InitialConditions();
+   
     private:
     SolarSystem(){}
     static SolarSystem* solar_system_;
     std::vector<std::shared_ptr<Body>> bodies_;
-    bool is_start = true;
+    bool is_start_ = true;
     Vector2Elm position_;
     double totalMass_= 0;;
     bool is_imported_= false;
