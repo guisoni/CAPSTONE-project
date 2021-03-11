@@ -25,7 +25,7 @@ void Textures::AddTexture(){
 }
 
 void Textures::AddScaleFactor(const int &refmeasure, const double &Diam){
-        scale_texture_.push_back(Diam/refmeasure*0.99633333333);
+        scale_texture_.push_back(Diam/refmeasure);
 }
 
 void Textures::TextureFromImageLoad(int index, std::string filename){

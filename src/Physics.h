@@ -10,6 +10,22 @@
 #include <memory>
 #include <numeric>
 
+class ImgPosScale{
+    public:
+        ImgPosScale():x_{0},y_{0}, scaleWidth_{0},scaleHeight_{0}{}
+        ImgPosScale(double x, double y, double width, double height):x_{x},y_{y}, scaleWidth_{width},scaleHeight_{height}{}
+        double X(){return x_;}
+        double Y(){return y_;}
+        double ScaleWidth(){return scaleWidth_;}
+        double ScaleHeight(){return scaleHeight_;}
+
+    private:
+    double x_;
+    double y_;
+    double scaleWidth_;
+    double scaleHeight_;
+};
+
 namespace AuxMath{
     template <typename T>
     T abs(T value){
@@ -90,19 +106,24 @@ class Vector2Elm
 class Body{
     public:
     Body():
-         position_{0.,0.},
-         velocity_{0.,0.},
-         acceleration_{0.,0.},
-         angular_position_{0.},
-         angular_velocity_{0.},
-         mass_{0.},
-         mass_moment_Inertia_{0.},
-         bodyName_{""},
-         Perihelion_{0.},
-         Aphelion_{0.},
-         diameter_{0.}{}
-
-    Body(Vector2Elm pos, Vector2Elm vel, Vector2Elm accel, double ang_pos, double ang_vel, double mass, double J, std::string body_name, double perihl, double aphl, double diam ) : position_{pos}, velocity_{vel}, acceleration_{accel}, angular_position_{ang_pos},angular_velocity_{ang_vel}, mass_{mass}, mass_moment_Inertia_{J}, bodyName_{body_name}, Perihelion_{perihl}, Aphelion_{aphl},diameter_{diam} {}    
+         position_{0.,0.}, velocity_{0.,0.}, acceleration_{0.,0.},
+         angular_position_{0.}, angular_velocity_{0.},  mass_{0.},
+         mass_moment_Inertia_{0.}, bodyName_{""}, Perihelion_{0.},
+         Aphelion_{0.}, diameter_{0.},image_pos_scale_{}{
+            
+         }
+    Body(Vector2Elm pos, Vector2Elm vel, Vector2Elm accel,
+         double ang_pos, double ang_vel, double mass, double J,
+        std::string body_name, double perihl, double aphl,
+        double diam, ImgPosScale imgData) : position_{pos}, velocity_{vel}, 
+        acceleration_{accel}, angular_position_{ang_pos},
+        angular_velocity_{ang_vel}, mass_{mass}, 
+        mass_moment_Inertia_{J}, bodyName_{body_name}, 
+        Perihelion_{perihl}, Aphelion_{aphl},diameter_{diam} {
+            image_pos_scale_ = imgData;
+            
+    }
+        
     Vector2Elm GetPosition(){return position_;}
     Vector2Elm GetVelocity(){return velocity_;}
     Vector2Elm GetAcceleration(){return acceleration_;}
@@ -112,6 +133,7 @@ class Body{
     double GetMomentInertia(){return mass_moment_Inertia_;}
     std::string GetName(){return bodyName_;}
     double GetDiameter(){return diameter_;}
+    ImgPosScale GetImgData(){return this->image_pos_scale_;};
 
     Vector2Elm GravityForcePerMass(std::shared_ptr<Body> b);
 
@@ -144,6 +166,7 @@ class Body{
     double Perihelion_;
     double Aphelion_;
     double diameter_; 
+    ImgPosScale image_pos_scale_;
     friend class SolarSystem;
 };
 

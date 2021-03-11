@@ -162,19 +162,17 @@ void SolarSystem::ImportData(){
             numlines +=1;
             if(numlines >1){
                 Vector2Elm pos, vel, accel;
-                double ang_pos, ang_vel, mass, J, perihl, aphl, diam;
+                double ang_pos, ang_vel, mass, J, perihl, aphl, diam, errorx, errory, scalewidth, scaleheight;
                 std::string name;
                 std::istringstream strstream(line);
-                if(strstream  >> name >> perihl >> aphl>> diam >> mass >> ang_vel){
+                if(strstream  >> name >> perihl >> aphl>> diam >> mass >> ang_vel >> errorx >> errory >> scalewidth >> scaleheight){
                     pos = {0,0};
                     vel = {0,0};
                     accel = {0,0};
-                    J = 2/5*mass*pow(diam/2,2);
-                    if(name == "MOON"){
-                        pos = pos  +  (bodies_[bodies_.size()-1])->GetPosition();
-                        std::cout << pos.x_ << " " << pos.y_ <<"\n";
-                    }
-                    std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl,diam));
+                    std::cout<< name <<"\n";
+                    J = 2.0/5.0*mass*pow(diam/2.0,2.0);
+                    ImgPosScale imgData(errorx, errory, scalewidth, scaleheight);
+                    std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl,diam,imgData));
                     AddBody(std::move(b));
                     std::cout<< numlines <<"\n";
                     is_imported_ = is_imported && true;
@@ -184,7 +182,6 @@ void SolarSystem::ImportData(){
                 }
             }
         }
-        CenterOfMass();
     }
 }
 
@@ -286,7 +283,7 @@ void SolarSystem::InitialConditions(){
             }       
         }
     }
-
+    CenterOfMass();
     for(int i = 0; i < bodies_.size(); i++){
         if(bodies_[i]->bodyName_ != "SUN"){
             if(bodies_[i]->bodyName_ != "MOON"){

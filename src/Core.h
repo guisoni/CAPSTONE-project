@@ -5,7 +5,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "Physics.h"
-enum PlanetsEnum{KMERCURY,KVENUS, KEARTH, KMOON, KMARS, KJUPITER, KSATURN, KNEPTUNE, KURANUS, KPLUTO, KSUN};
+enum PlanetsEnum{KMERCURY,KVENUS, KEARTH, KMOON, KMARS, KJUPITER, KSATURN, KURANUS, KNEPTUNE, KPLUTO, KSUN};
 class Core{
     public: 
     static Core *GetCore();
@@ -43,6 +43,7 @@ class Core{
     double scale_factor_= 10000;
     Vector2Elm displ_ = {0,0};
     Vector2Elm vel_ = {0  ,-11190/700000000};
+    int delta_= 1;
 };
 #endif
 

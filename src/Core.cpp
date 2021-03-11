@@ -5,6 +5,7 @@
 #include "Physics.h"
 #include "Textures.h"
 #include <limits>
+#include <iomanip>
 Core *Core::GetCore(){
     if(core_ == nullptr){
         core_= new Core(); 
@@ -71,18 +72,16 @@ void Core::RunGame(){
     double dt;
     dt = 876*10; 
     
-
     for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
         Textures::GetTextures()->AddTexture();
         std::string filename = SolarSystem::GetSolarSystem()->GetBody(index)->GetName();
+        std::cout << filename <<"\n";
         Textures::GetTextures()->TextureFromImageLoad(index,"../image/" + filename + ".png");
         SDL_Rect source{0,0,0,0};
         Textures::GetTextures()->GetTextureSize(index, source);
         double diameter = SolarSystem::GetSolarSystem()->GetBody(index)->GetDiameter();
-        if(filename == "SATURN"){
-            diameter *=1.9;
-        }
         Textures::GetTextures()->AddScaleFactor(source.w, diameter);
+        
         
     }
     while(Core::GetCore()->GetStatus()){
@@ -95,27 +94,41 @@ void Core::RunGame(){
                 Vector2Elm position;
                 //displ_ = displ_+ vel_* dt;
                 position = SolarSystem::GetSolarSystem()->GetBody(index)->Transform(SolarSystem::GetSolarSystem()->GetBody(cameraId_));
-                //position.y_ = position.y_  - SolarSystem::GetSolarSystem()->GetBody(2)->GetDiameter()/2;
+                double R = SolarSystem::GetSolarSystem()->GetBody(cameraId_)->GetDiameter()/2*scale_factor_;
+                
+                position.x_ = position.x_  - SolarSystem::GetSolarSystem()->GetBody(cameraId_)->GetDiameter()/2;
                 //position.LogarithmScale();
-                position = (position * scale_factor_)- displ_;
+                ImgPosScale imgData = SolarSystem::GetSolarSystem()->GetBody(index)->GetImgData();
+                //std::cout<<imgData.X()<<", "<<imgData.Y() << "\n";
+                //std::cout<<position.x_<<" "<<position.y_ << "\n";
+                position.x_ = ((position.x_+ imgData.X()) * scale_factor_)- displ_.x_;
+                position.y_ = ((position.y_+ imgData.Y()) * scale_factor_)- displ_.y_;
+                //std::cout<<position.x_<<" "<<position.y_ << "\n";
                 SDL_Rect source = {0, 0, 0, 0}; 
                 Textures::GetTextures()->GetTextureSize(index, source);
-                source.w = static_cast<int>(source.w*(scale_factor_*Textures::GetTextures()->GetScaleFactor(index)));
+                std::cout<<source.w<<"\n";
+                double scalex = Textures::GetTextures()->GetScaleFactor(index);
+                double scaley = Textures::GetTextures()->GetScaleFactor(index);
+                source.w = static_cast<int>(source.w*(scale_factor_*scalex*imgData.ScaleWidth()));
                 source.w = (source.w <= 4)? 4:source.w; 
-                source.h = static_cast<int>(source.h*(scale_factor_*Textures::GetTextures()->GetScaleFactor(index))); 
+                source.h = static_cast<int>(source.h*(scale_factor_*scaley*imgData.ScaleHeight())); 
                 source.h = (source.h <= 4)? 4:source.h;
                 SDL_Rect dest = source;
                 long max_pos_x = std::numeric_limits<int>::max()-screen_width_/2.0 + source.w/2.0;
                 long max_pos_y = std::numeric_limits<int>::max() + screen_height_/2.0 - source.h/2.0;
                 if(AuxMath::abs(position.x_) <= max_pos_y && AuxMath::abs(position.y_) <= max_pos_y){  
-                    pixelposition.x = static_cast<int>(screen_width_/2.0 + position.x_- source.w/2.0);
+                    pixelposition.x = static_cast<int>(screen_width_/2.0 + position.x_- source.w/2.0 );
                     pixelposition.y = static_cast<int>(screen_height_/2.0 - position.y_ - source.h/2.0);
                     dest.x = pixelposition.x;
                     dest.y = pixelposition.y;
                     Textures::GetTextures()->Draw(index,NULL, &dest);
-                    SDL_SetRenderDrawColor( sdl_renderer_, 0xFF, 0xFF, 0x00, 0xFF );
+                    SDL_SetRenderDrawColor( sdl_renderer_, 0xFF, 0x00, 0xFF, 0xFF );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2 );
-                    std::cout<< displ_.x_ <<" "<<displ_.y_<<"\n";
+                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2+static_cast<int>(R), screen_height_/2 );
+                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2-static_cast<int>(R), screen_height_/2 );
+                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2-static_cast<int>(R) );
+                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2+static_cast<int>(R) );
+                    std::cout<< std::setprecision(15) << displ_.x_ <<" "<<std::setprecision(15)<<displ_.y_<<" " << delta_<<"\n";
                 }   
         }
                 
@@ -243,20 +256,26 @@ void Core::EventHandler(){
                 case SDLK_x:
                      if(scale_factor_ >= 0.000000000001){
                          scale_factor_ /= 2;
-                         displ_ = displ_/2;
+                         displ_ =displ_/2; 
                      }
                      break;
                 case SDLK_UP:
-                    displ_.y_= displ_.y_- 1;
+                    displ_.y_+= delta_;
                     break;
                 case SDLK_DOWN:
-                    displ_.y_ = displ_.y_+ 1;
+                    displ_.y_ -= delta_;
                     break;
                 case SDLK_LEFT:
-                    displ_.x_ = displ_.x_- 1;
+                    displ_.x_ -= delta_;
                     break;
                 case SDLK_RIGHT:
-                    displ_.x_ = displ_.x_+ 1;
+                    displ_.x_ += delta_;
+                    break;
+                case SDLK_j:
+                    delta_ *= 2;
+                    break;
+                case SDLK_m:
+                    delta_ /= 2;
                     break;
                     
 
