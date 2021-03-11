@@ -10,6 +10,8 @@
 #include <memory>
 #include <numeric>
 
+
+
 class ImgPosScale{
     public:
         ImgPosScale():x_{0},y_{0}, scaleWidth_{0},scaleHeight_{0}{}
@@ -27,6 +29,18 @@ class ImgPosScale{
 };
 
 namespace AuxMath{
+    const double PI = 3.14159265359;
+    template <typename T>
+        T radians(T angle){
+            angle*=PI/180.0;
+            return angle;
+        }
+    template <typename T>
+    T degrees(T angle){
+        angle*=180.0/PI;
+        return angle;
+    }
+
     template <typename T>
     T abs(T value){
         return ((value >= 0) ? value :-value); 
@@ -112,11 +126,10 @@ class Body{
          Aphelion_{0.}, diameter_{0.},image_pos_scale_{}{
             
          }
-    Body(Vector2Elm pos, Vector2Elm vel, Vector2Elm accel,
-         double ang_pos, double ang_vel, double mass, double J,
+    Body(double ang_vel, double mass, double J,
         std::string body_name, double perihl, double aphl,
-        double diam, ImgPosScale imgData) : position_{pos}, velocity_{vel}, 
-        acceleration_{accel}, angular_position_{ang_pos},
+        double diam, ImgPosScale imgData) : position_{0, 0}, velocity_{0, 0}, 
+        acceleration_{0,0}, angular_position_{0},
         angular_velocity_{ang_vel}, mass_{mass}, 
         mass_moment_Inertia_{J}, bodyName_{body_name}, 
         Perihelion_{perihl}, Aphelion_{aphl},diameter_{diam} {

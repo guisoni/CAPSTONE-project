@@ -4,7 +4,7 @@
 #include "Core.h"
 #include "Physics.h"
 #include "Textures.h"
-#include <limits>
+#include "PixelMath.h"
 #include <iomanip>
 Core *Core::GetCore(){
     if(core_ == nullptr){
@@ -92,43 +92,56 @@ void Core::RunGame(){
             for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
                 SDL_Point pixelposition;
                 Vector2Elm position;
-                //displ_ = displ_+ vel_* dt;
                 position = SolarSystem::GetSolarSystem()->GetBody(index)->Transform(SolarSystem::GetSolarSystem()->GetBody(cameraId_));
-                double R = SolarSystem::GetSolarSystem()->GetBody(cameraId_)->GetDiameter()/2*scale_factor_;
-                
-                position.x_ = position.x_  - SolarSystem::GetSolarSystem()->GetBody(cameraId_)->GetDiameter()/2;
+                double R = SolarSystem::GetSolarSystem()->GetBody(cameraId_)->GetDiameter()/2.0;
+                position.y_ = position.y_ - R;
                 //position.LogarithmScale();
-                ImgPosScale imgData = SolarSystem::GetSolarSystem()->GetBody(index)->GetImgData();
                 //std::cout<<imgData.X()<<", "<<imgData.Y() << "\n";
                 //std::cout<<position.x_<<" "<<position.y_ << "\n";
-                position.x_ = ((position.x_+ imgData.X()) * scale_factor_)- displ_.x_;
-                position.y_ = ((position.y_+ imgData.Y()) * scale_factor_)- displ_.y_;
                 //std::cout<<position.x_<<" "<<position.y_ << "\n";
                 SDL_Rect source = {0, 0, 0, 0}; 
                 Textures::GetTextures()->GetTextureSize(index, source);
-                std::cout<<source.w<<"\n";
+                ImgPosScale imgData = SolarSystem::GetSolarSystem()->GetBody(index)->GetImgData();                
+                double imgDataX= imgData.X();
+                double imgDataY= imgData.Y();
+                position.x_ = ((position.x_+ imgDataX) * scale_factor_)- displ_.x_;
+                position.y_ = ((position.y_+ imgDataY)* scale_factor_)- displ_.y_;  
                 double scalex = Textures::GetTextures()->GetScaleFactor(index);
                 double scaley = Textures::GetTextures()->GetScaleFactor(index);
                 source.w = static_cast<int>(source.w*(scale_factor_*scalex*imgData.ScaleWidth()));
-                source.w = (source.w <= 4)? 4:source.w; 
+                source.w = (source.w <= minBodySize_)? minBodySize_:source.w; 
                 source.h = static_cast<int>(source.h*(scale_factor_*scaley*imgData.ScaleHeight())); 
-                source.h = (source.h <= 4)? 4:source.h;
+                source.h = (source.h <= minBodySize_)? minBodySize_:source.h;
                 SDL_Rect dest = source;
-                long max_pos_x = std::numeric_limits<int>::max()-screen_width_/2.0 + source.w/2.0;
-                long max_pos_y = std::numeric_limits<int>::max() + screen_height_/2.0 - source.h/2.0;
-                if(AuxMath::abs(position.x_) <= max_pos_y && AuxMath::abs(position.y_) <= max_pos_y){  
-                    pixelposition.x = static_cast<int>(screen_width_/2.0 + position.x_- source.w/2.0 );
-                    pixelposition.y = static_cast<int>(screen_height_/2.0 - position.y_ - source.h/2.0);
+                double angle = 0;
+                SDL_Point center; 
+                if(PixelMath::ConvertPositionToPixel(position, pixelposition, source, screen_width_,screen_height_)){  
                     dest.x = pixelposition.x;
                     dest.y = pixelposition.y;
-                    Textures::GetTextures()->Draw(index,NULL, &dest);
-                    SDL_SetRenderDrawColor( sdl_renderer_, 0xFF, 0x00, 0xFF, 0xFF );
+                    //shuts off rotation if size is small
+                    if(source.w == minBodySize_ && source.h == minBodySize_){
+                        angle = 0;
+                        Textures::GetTextures()->Draw(index,NULL, &dest, angle, NULL, SDL_FLIP_NONE);
+                    }else{
+                        angle = SolarSystem::GetSolarSystem()->GetBody(index)->GetAngularPosition();
+                        Vector2Elm displCenter;
+                        displCenter = {imgDataX*scale_factor_, imgDataY*scale_factor_};
+                        SDL_Rect zero = {0,0,0,0};
+                        //Convert offset to pixel
+                        PixelMath::ConvertPositionToPixel(displCenter, center, zero, dest.w, dest.h);
+                        //convert position to pixel position
+                        PixelMath::ConvertPositionToPixel(position, pixelposition, source, screen_width_,screen_height_);
+                        //Textures::GetTextures()->Draw(index,NULL, &dest, angle, &center, SDL_FLIP_NONE);
+                        Textures::GetTextures()->Draw(index,NULL, &dest, angle, NULL, SDL_FLIP_NONE);
+                    }
+
+                    SDL_SetRenderDrawColor( sdl_renderer_, 0, 0, 0, 0xFF );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2 );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2+static_cast<int>(R), screen_height_/2 );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2-static_cast<int>(R), screen_height_/2 );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2-static_cast<int>(R) );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2+static_cast<int>(R) );
-                    std::cout<< std::setprecision(15) << displ_.x_ <<" "<<std::setprecision(15)<<displ_.y_<<" " << delta_<<"\n";
+                    //std::cout<< std::setprecision(15) << displ_.x_ <<" "<<std::setprecision(15)<<displ_.y_<<" " << delta_<<"\n";
                 }   
         }
                 

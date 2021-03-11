@@ -8,7 +8,8 @@
 #include <numeric>
 #include <random>
 #include "Physics.h"
-    
+
+
 //this + Vector2Elm
 Vector2Elm Vector2Elm::operator+(const Vector2Elm &b)const{
     Vector2Elm a;
@@ -123,8 +124,15 @@ void Body::UpdatePosition(const double &dt){
     position_ = position_ + velocity_ * dt;
 }
 
-void Body::UpdateAngularPosition(const double &dt){
+
+void Body::UpdateAngularPosition(const double &dt){    
     angular_position_ += angular_velocity_ * dt;
+    if(angular_position_ >= 2*AuxMath::PI){
+      angular_position_-=2*AuxMath::PI;
+    }
+    if(AuxMath::degrees(angular_position_) < 0){
+      angular_position_+=2*AuxMath::PI;
+    }
 }
 
 
@@ -166,13 +174,10 @@ void SolarSystem::ImportData(){
                 std::string name;
                 std::istringstream strstream(line);
                 if(strstream  >> name >> perihl >> aphl>> diam >> mass >> ang_vel >> errorx >> errory >> scalewidth >> scaleheight){
-                    pos = {0,0};
-                    vel = {0,0};
-                    accel = {0,0};
                     std::cout<< name <<"\n";
                     J = 2.0/5.0*mass*pow(diam/2.0,2.0);
                     ImgPosScale imgData(errorx, errory, scalewidth, scaleheight);
-                    std::unique_ptr<Body> b = std::make_unique<Body>(Body(pos,vel,accel,ang_pos,ang_vel,mass,J,name,perihl,aphl,diam,imgData));
+                    std::unique_ptr<Body> b = std::make_unique<Body>(Body(ang_vel,mass,J,name,perihl,aphl,diam,imgData));
                     AddBody(std::move(b));
                     std::cout<< numlines <<"\n";
                     is_imported_ = is_imported && true;
@@ -207,6 +212,7 @@ void SolarSystem::Update(const double dt){
         if((**body).GetName()!="SUN"){
             (**body).UpdatePosition(dt);
         }
+        (**body).UpdateAngularPosition(dt);
     }
 }
 

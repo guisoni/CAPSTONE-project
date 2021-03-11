@@ -44,6 +44,7 @@ class Core{
     Vector2Elm displ_ = {0,0};
     Vector2Elm vel_ = {0  ,-11190/700000000};
     int delta_= 1;
+    const int minBodySize_ = 4;
 };
 #endif
 

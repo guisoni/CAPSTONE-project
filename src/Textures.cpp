@@ -58,9 +58,9 @@ void Textures::TextureFromImageLoad(int index, std::string filename){
     //Clear screen
 }
 
-void Textures::Draw(int index, SDL_Rect *source,SDL_Rect *dest){
+void Textures::Draw(int index, SDL_Rect *source,SDL_Rect *dest,double angle,SDL_Point *center, SDL_RendererFlip flip){
             //Render texture to screen
-		SDL_RenderCopy( Core::GetCore()->GetRenderer(), texture_.at(index), source, dest);
+		SDL_RenderCopyEx( Core::GetCore()->GetRenderer(), texture_.at(index), source, dest, angle, center, flip);
         
 }
 
