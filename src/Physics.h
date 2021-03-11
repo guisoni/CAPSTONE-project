@@ -99,6 +99,8 @@ class Vector2Elm
     double operator^(const Vector2Elm &&b) const ;
     
     double abs() const;
+Vector2Elm Transform(const Vector2Elm &b);
+Vector2Elm RotationTransform(const double &angle);
 
     void LogarithmScale(){
         double r = this->abs();
@@ -166,6 +168,8 @@ class Body{
     void PrintBody();
 
     Vector2Elm Transform(std::shared_ptr<Body> b);
+
+    Vector2Elm RotationTransform(std::shared_ptr<Body> b, double angle);
 
     private:
     Vector2Elm position_;

@@ -92,20 +92,30 @@ void Core::RunGame(){
             for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
                 SDL_Point pixelposition;
                 Vector2Elm position;
-                position = SolarSystem::GetSolarSystem()->GetBody(index)->Transform(SolarSystem::GetSolarSystem()->GetBody(cameraId_));
-                double R = SolarSystem::GetSolarSystem()->GetBody(cameraId_)->GetDiameter()/2.0;
-                position.y_ = position.y_ - R;
+                std::shared_ptr<Body> thisBody =  SolarSystem::GetSolarSystem()->GetBody(index);
+                std::shared_ptr<Body> refBody =  SolarSystem::GetSolarSystem()->GetBody(cameraId_);
+                position = thisBody->GetPosition();
+                position = position.Transform(refBody->GetPosition());
+                //position = SolarSystem::GetSolarSystem()->GetBody(index)->Transform(SolarSystem::GetSolarSystem()->GetBody(cameraId_));
+                double R = refBody->GetDiameter()/2.0;
+                //position.y_ = position.y_ - R;
+                //position = SolarSystem::GetSolarSystem()->GetBody(index)->RotationTransform(SolarSystem::GetSolarSystem()->GetBody(cameraId_),angle);                
                 //position.LogarithmScale();
                 //std::cout<<imgData.X()<<", "<<imgData.Y() << "\n";
                 //std::cout<<position.x_<<" "<<position.y_ << "\n";
                 //std::cout<<position.x_<<" "<<position.y_ << "\n";
                 SDL_Rect source = {0, 0, 0, 0}; 
                 Textures::GetTextures()->GetTextureSize(index, source);
-                ImgPosScale imgData = SolarSystem::GetSolarSystem()->GetBody(index)->GetImgData();                
+                ImgPosScale imgData = thisBody->GetImgData();                
                 double imgDataX= imgData.X();
                 double imgDataY= imgData.Y();
                 position.x_ = ((position.x_+ imgDataX) * scale_factor_)- displ_.x_;
-                position.y_ = ((position.y_+ imgDataY)* scale_factor_)- displ_.y_;  
+                position.y_ = ((position.y_+ imgDataY)* scale_factor_)- displ_.y_;
+                double angle =  thisBody->GetAngularPosition();
+                if(isLocked_){
+                    //transform in relation to the rotation of a planet  
+                    position = position.RotationTransform(angle);
+                }
                 double scalex = Textures::GetTextures()->GetScaleFactor(index);
                 double scaley = Textures::GetTextures()->GetScaleFactor(index);
                 source.w = static_cast<int>(source.w*(scale_factor_*scalex*imgData.ScaleWidth()));
@@ -113,34 +123,41 @@ void Core::RunGame(){
                 source.h = static_cast<int>(source.h*(scale_factor_*scaley*imgData.ScaleHeight())); 
                 source.h = (source.h <= minBodySize_)? minBodySize_:source.h;
                 SDL_Rect dest = source;
-                double angle = 0;
                 SDL_Point center; 
                 if(PixelMath::ConvertPositionToPixel(position, pixelposition, source, screen_width_,screen_height_)){  
                     dest.x = pixelposition.x;
                     dest.y = pixelposition.y;
-                    //shuts off rotation if size is small
-                    if(source.w == minBodySize_ && source.h == minBodySize_){
-                        angle = 0;
-                        Textures::GetTextures()->Draw(index,NULL, &dest, angle, NULL, SDL_FLIP_NONE);
+                    if(!isLocked_){
+                        if(thisBody->GetName() != refBody->GetName()){ 
+                            //shuts off rotation if size is small
+                            if(source.w == minBodySize_ && source.h == minBodySize_){
+                                Textures::GetTextures()->Draw(index,NULL, &dest, 0.0, NULL, SDL_FLIP_NONE);
+                            }else{
+                                //angle = -SolarSystem::GetSolarSystem()->GetBody(index)->GetAngularPosition();
+                                Vector2Elm displCenter;
+                                displCenter = {imgDataX*scale_factor_, imgDataY*scale_factor_};
+                                SDL_Rect zero = {0,0,0,0};
+                                //Convert offset to pixel
+                                PixelMath::ConvertPositionToPixel(displCenter, center, zero, dest.w, dest.h);
+                                //convert position to pixel position
+                                PixelMath::ConvertPositionToPixel(position, pixelposition, source, screen_width_,screen_height_);
+                                //Textures::GetTextures()->Draw(index,NULL, &dest, angle, &center, SDL_FLIP_NONE);
+                                Textures::GetTextures()->Draw(index,NULL, &dest, AuxMath::degrees(-angle), NULL, SDL_FLIP_NONE);
+                            }    
+                        }else{
+                           Textures::GetTextures()->Draw(index,NULL, &dest, 0.0, NULL, SDL_FLIP_NONE);   
+                        }
                     }else{
-                        angle = SolarSystem::GetSolarSystem()->GetBody(index)->GetAngularPosition();
-                        Vector2Elm displCenter;
-                        displCenter = {imgDataX*scale_factor_, imgDataY*scale_factor_};
-                        SDL_Rect zero = {0,0,0,0};
-                        //Convert offset to pixel
-                        PixelMath::ConvertPositionToPixel(displCenter, center, zero, dest.w, dest.h);
-                        //convert position to pixel position
-                        PixelMath::ConvertPositionToPixel(position, pixelposition, source, screen_width_,screen_height_);
-                        //Textures::GetTextures()->Draw(index,NULL, &dest, angle, &center, SDL_FLIP_NONE);
-                        Textures::GetTextures()->Draw(index,NULL, &dest, angle, NULL, SDL_FLIP_NONE);
+                        Textures::GetTextures()->Draw(index,NULL, &dest, 0.0, NULL, SDL_FLIP_NONE);
                     }
-
+                    
                     SDL_SetRenderDrawColor( sdl_renderer_, 0, 0, 0, 0xFF );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2 );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2+static_cast<int>(R), screen_height_/2 );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2-static_cast<int>(R), screen_height_/2 );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2-static_cast<int>(R) );
                     SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2+static_cast<int>(R) );
+                    std::cout << thisBody->GetName() <<" " << refBody->GetName()<<" " <<isLocked_ <<"\n";
                     //std::cout<< std::setprecision(15) << displ_.x_ <<" "<<std::setprecision(15)<<displ_.y_<<" " << delta_<<"\n";
                 }   
         }
@@ -285,12 +302,14 @@ void Core::EventHandler(){
                     displ_.x_ += delta_;
                     break;
                 case SDLK_j:
-                    delta_ *= 2;
+                    multiplyDelta(2);
                     break;
                 case SDLK_m:
-                    delta_ /= 2;
+                    multiplyDelta(1/2);
                     break;
-                    
+                case SDLK_l:
+                    isLocked_ = !isLocked_;
+                    break;    
 
             }
         }    

@@ -5,6 +5,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "Physics.h"
+#include <limits>
 enum PlanetsEnum{KMERCURY,KVENUS, KEARTH, KMOON, KMARS, KJUPITER, KSATURN, KURANUS, KNEPTUNE, KPLUTO, KSUN};
 class Core{
     public: 
@@ -26,7 +27,12 @@ class Core{
     void ClearRenderer();
 
     void EventHandler();
-
+    
+    void multiplyDelta(int multiply){
+        if(multiply * delta_ >=1 && multiply*delta_ <= std::numeric_limits<int>::max() ){
+            delta_ *= multiply;
+        }
+    }
     private:
     Core(){};
     static Core *core_;
@@ -45,6 +51,7 @@ class Core{
     Vector2Elm vel_ = {0  ,-11190/700000000};
     int delta_= 1;
     const int minBodySize_ = 4;
+    bool isLocked_ = false;
 };
 #endif
 

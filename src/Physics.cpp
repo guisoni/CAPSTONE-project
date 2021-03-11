@@ -86,18 +86,29 @@ Vector2Elm Vector2Elm::operator*(const Vector2Elm &&b) const {
     a.y_ = y_ * b.y_;
     return a; 
 }
-    //this vectorial product a Vector2Elm
-    double Vector2Elm::operator^(const Vector2Elm &b) const {
-       return x_*b.y_-y_*b.x_;
-    }
-    //this vectorial product a Vector2Elm
-    double Vector2Elm::operator^(const Vector2Elm &&b) const {
-       return x_*b.y_-y_*b.x_;
-    }
+//this vectorial product a Vector2Elm
+double Vector2Elm::operator^(const Vector2Elm &b) const {
+   return x_*b.y_-y_*b.x_;
+}
+//this vectorial product a Vector2Elm
+double Vector2Elm::operator^(const Vector2Elm &&b) const {
+   return x_*b.y_-y_*b.x_;
+}
     
-    double Vector2Elm::abs() const {
-        return sqrt(pow(x_,2.0)+pow(y_,2.0));
-    }
+double Vector2Elm::abs() const {
+    return sqrt(pow(x_,2.0)+pow(y_,2.0));
+}
+Vector2Elm Vector2Elm::Transform(const Vector2Elm &b){
+    return *this - b;
+}
+
+Vector2Elm Vector2Elm::RotationTransform(const double &angle)
+{
+ Vector2Elm transformed_position;
+ transformed_position.x_ = x_ * cos(angle) + y_*sin(angle);
+ transformed_position.y_ = -x_ * sin(angle) +y_*cos(angle);
+ return transformed_position;
+}
 
 
 
@@ -148,9 +159,6 @@ void Body::PrintBody(){
     //std::cout<< GetAcceleration().x_<<" "<< GetAcceleration().y_ <<")\n";
 }
 
-Vector2Elm Body::Transform(std::shared_ptr<Body> b){
-    return position_ - b->position_;
-}
 
 SolarSystem* SolarSystem::GetSolarSystem(){
     if(solar_system_ ==nullptr){
