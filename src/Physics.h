@@ -15,7 +15,7 @@
 class ImgPosScale{
     public:
         ImgPosScale():x_{0},y_{0}, scaleWidth_{0},scaleHeight_{0}{}
-        ImgPosScale(double x, double y, double width, double height):x_{x},y_{y}, scaleWidth_{width},scaleHeight_{height}{}
+        ImgPosScale(const double &x, const double &y, const double &width, const double &height):x_{x},y_{y}, scaleWidth_{width},scaleHeight_{height}{}
         double X(){return x_;}
         double Y(){return y_;}
         double ScaleWidth(){return scaleWidth_;}
