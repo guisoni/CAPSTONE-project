@@ -12,10 +12,10 @@ class Textures{
     static void FreeTextures();
     void AddTexture();
     void AddScaleFactor(const int &refmeasure, const double &Diam);
-    void TextureFromImageLoad(int index, std::string filename);
-    void EndTexture(int index);
-    void Draw(int index, SDL_Rect *source,SDL_Rect *dest,double angle,SDL_Point * center, SDL_RendererFlip flip);
-    int GetTextureSize(int id, SDL_Rect &textRect);
+    void TextureFromImageLoad(const int &index, const std::string &filename);
+    void EndTexture(const int &index);
+    void Draw(const int &index, const SDL_Rect *source,const SDL_Rect *dest,const  double &angle,const SDL_Point * center,const SDL_RendererFlip &flip);
+    int GetTextureSize(const int id, SDL_Rect &textRect) const;
     double GetScaleFactor(int index){return scale_texture_.at(index);}
     
     private:

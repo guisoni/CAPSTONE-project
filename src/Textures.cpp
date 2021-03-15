@@ -14,7 +14,8 @@ Textures *Textures::GetTextures(){
         return textures_;
     }
     return textures_;
-}        
+} 
+
 void Textures::FreeTextures(){
     std::cout<<"Textures Ended\n";
     delete textures_;
@@ -28,7 +29,7 @@ void Textures::AddScaleFactor(const int &refmeasure, const double &Diam){
         scale_texture_.push_back(Diam/refmeasure);
 }
 
-void Textures::TextureFromImageLoad(int index, std::string filename){
+void Textures::TextureFromImageLoad(const int &index, const std::string &filename){
 	//Update screen 
     if(texture_.at(index) != nullptr){
         SDL_DestroyTexture( texture_.at(index) );
@@ -58,13 +59,13 @@ void Textures::TextureFromImageLoad(int index, std::string filename){
     //Clear screen
 }
 
-void Textures::Draw(int index, SDL_Rect *source,SDL_Rect *dest,double angle,SDL_Point *center, SDL_RendererFlip flip){
+void Textures::Draw(const int &index,const  SDL_Rect *source, const SDL_Rect *dest, const double &angle, const SDL_Point *center, const  SDL_RendererFlip &flip){
             //Render texture to screen
 		SDL_RenderCopyEx( Core::GetCore()->GetRenderer(), texture_.at(index), source, dest, angle, center, flip);
         
 }
 
-void Textures::EndTexture(int index){
+void Textures::EndTexture(const int &index){
     if(texture_.at(index) != nullptr){
         SDL_DestroyTexture( texture_.at(index) );
         texture_.at(index) = nullptr;
@@ -73,7 +74,7 @@ void Textures::EndTexture(int index){
     }
 }
 
-int Textures::GetTextureSize(int id, SDL_Rect &textRect){
+int Textures::GetTextureSize(const int id, SDL_Rect &textRect) const {
     Uint32 format;
     int access;
     int testing;
