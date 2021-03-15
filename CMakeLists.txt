@@ -17,7 +17,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS} src)
 
-add_executable(SolarSystem src/main.cpp src/Physics.cpp src/Core.cpp src/Textures.cpp src/SolarSystem.cpp)
+add_executable(SolarSystem src/main.cpp src/Physics.cpp src/Core.cpp src/Textures.cpp src/SolarSystem.cpp src/Vector2Elm.cpp)
 string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
 target_link_libraries(SolarSystem ${SDL2_LIBRARIES})
 target_link_libraries(SolarSystem -lSDL2_image)

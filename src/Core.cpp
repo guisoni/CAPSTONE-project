@@ -3,6 +3,7 @@
 #include "SDL2/SDL_image.h"
 #include "Core.h"
 #include "Physics.h"
+#include "Vector2Elm.h"
 #include "Textures.h"
 #include "PixelMath.h"
 #include <iomanip>

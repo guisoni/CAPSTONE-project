@@ -146,13 +146,13 @@ void SolarSystem::InitialConditions(){
                 Vector2Elm force(0,0);
                 Vector2Elm accel;
                 accel = force + bodies_[i]->GravityForcePerMass(bodies_[10]);
-                double r = (bodies_[i]->position_-bodies_[10]->position_).abs();
+                double r = (bodies_[i]->position_-bodies_[10]->position_).Abs();
                 if(bodies_[i]->position_.y_ >= 0){
-                    bodies_[i]->velocity_.x_=  -sqrt(accel.abs()*(2*r - r*r/a))*cos(angle);
-                    bodies_[i]->velocity_.y_=  -sqrt(accel.abs()*(2*r - r*r/a))*sin(angle);  
+                    bodies_[i]->velocity_.x_=  -sqrt(accel.Abs()*(2*r - r*r/a))*cos(angle);
+                    bodies_[i]->velocity_.y_=  -sqrt(accel.Abs()*(2*r - r*r/a))*sin(angle);  
                 }else{
-                    bodies_[i]->velocity_.x_=   sqrt(accel.abs()*(2*r - r*r/a))*cos(angle);
-                    bodies_[i]->velocity_.y_=   sqrt(accel.abs()*(2*r - r*r/a))*sin(angle);  
+                    bodies_[i]->velocity_.x_=   sqrt(accel.Abs()*(2*r - r*r/a))*cos(angle);
+                    bodies_[i]->velocity_.y_=   sqrt(accel.Abs()*(2*r - r*r/a))*sin(angle);  
                 }            
             }else{   
                 {
@@ -160,15 +160,15 @@ void SolarSystem::InitialConditions(){
                     Vector2Elm force(0,0);
                     Vector2Elm accel;
                     accel = force + bodies_[i]->GravityForcePerMass(bodies_[i-1]);
-                    double r = (bodies_[i]->position_-bodies_[i-1]->position_).abs();
-                    bodies_[i]->velocity_.y_= -sqrt(accel.abs()*(2*r - r*r/a));   
+                    double r = (bodies_[i]->position_-bodies_[i-1]->position_).Abs();
+                    bodies_[i]->velocity_.y_= -sqrt(accel.Abs()*(2*r - r*r/a));   
                 }
                 double a = (bodies_[i-1]->Perihelion_+bodies_[i-1]->Aphelion_)/2;
                 Vector2Elm force(0,0);
                 Vector2Elm accel;
                 accel = force + bodies_[i]->GravityForcePerMass(bodies_[10]);
-                double r = (bodies_[i-1]->position_- bodies_[10]->position_).abs(); 
-                bodies_[i]->velocity_.x_-= sqrt(accel.abs()*(2*r - r*r/a));
+                double r = (bodies_[i-1]->position_- bodies_[10]->position_).Abs(); 
+                bodies_[i]->velocity_.x_-= sqrt(accel.Abs()*(2*r - r*r/a));
 
             }          
         }

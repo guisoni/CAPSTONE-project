@@ -10,6 +10,7 @@
 #include <memory>
 #include <numeric>
 #include <random> 
+#include "Vector2Elm.h"
 
 class SolarSystem{
     public:
