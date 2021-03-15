@@ -152,7 +152,6 @@ class Body{
      //aproximated initial velocity
     void InitialVelocity(std::shared_ptr <Body> );
 
-    void TangentialVelocity();
 
     void PrintBody();
 

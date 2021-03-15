@@ -102,7 +102,6 @@ Vector2Elm Vector2Elm::RotationTransform(const double &angle)
 }
 
 
-
 Vector2Elm Body::GravityForcePerMass(std::shared_ptr<Body> b){
     const double GravitationalConst = 0.0000003929131713; //= GM/r3
     Vector2Elm deltaPosition = b->position_- position_;
@@ -138,16 +137,11 @@ void Body::UpdateAngularPosition(const double &dt){
 }
 
 
-void Body::TangentialVelocity(){
-    double a = (Perihelion_ + Aphelion_)/2;
-    velocity_.x_= sqrt(0);
-    velocity_.y_= sqrt(acceleration_.abs()*a); 
-}
-
 void Body::PrintBody(){
-    std::cout<< GetPosition().x_<<", "<< GetPosition().y_ <<"  ";//\nvelocity is :(";
-    std::cout<< GetVelocity().x_<<", "<< GetVelocity().y_ <<"\n";//acceleration is: (";
-    //std::cout<< GetAcceleration().x_<<" "<< GetAcceleration().y_ <<")\n";
+    std::cout<<"Body name: " << GetName() <<"\n";
+    std::cout<<"Position: " << GetPosition().x_<<", "<< GetPosition().y_ <<"  ";\
+    std::cout<<"Velocity: "  << GetVelocity().x_<<", "<< GetVelocity().y_ <<"\n";
+    std::cout<<"Acceleration " << GetAcceleration().x_ <<" "<< GetAcceleration().y_ <<")\n";
 }
 
 
