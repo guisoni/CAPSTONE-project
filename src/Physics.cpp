@@ -89,6 +89,7 @@ double Vector2Elm::operator^(const Vector2Elm &&b) const {
 double Vector2Elm::abs() const {
     return sqrt(pow(x_,2.0)+pow(y_,2.0));
 }
+
 Vector2Elm Vector2Elm::Transform(const Vector2Elm &b){
     return *this - b;
 }
@@ -102,7 +103,7 @@ Vector2Elm Vector2Elm::RotationTransform(const double &angle)
 }
 
 
-Vector2Elm Body::GravityForcePerMass(std::shared_ptr<Body> b){
+Vector2Elm Body::GravityForcePerMass(const std::shared_ptr<Body> &b) const{
     const double GravitationalConst = 0.0000003929131713; //= GM/r3
     Vector2Elm deltaPosition = b->position_- position_;
     return (deltaPosition)/pow(deltaPosition.abs(), 3.0)*(GravitationalConst * b->mass_);

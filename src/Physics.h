@@ -114,8 +114,7 @@ class Body{
          position_{0.,0.}, velocity_{0.,0.}, acceleration_{0.,0.},
          angular_position_{0.}, angular_velocity_{0.},  mass_{0.},
          mass_moment_Inertia_{0.}, bodyName_{""}, Perihelion_{0.},
-         Aphelion_{0.}, diameter_{0.},image_pos_scale_{}{
-            
+         Aphelion_{0.}, diameter_{0.},image_pos_scale_{}{            
          }
     Body(double ang_vel, double mass, double J,
         std::string body_name, double perihl, double aphl,
@@ -124,8 +123,7 @@ class Body{
         angular_velocity_{ang_vel}, mass_{mass}, 
         mass_moment_Inertia_{J}, bodyName_{body_name}, 
         Perihelion_{perihl}, Aphelion_{aphl},diameter_{diam} {
-            image_pos_scale_ = imgData;
-            
+            image_pos_scale_ = imgData;            
     }
         
     Vector2Elm GetPosition(){return position_;}
@@ -136,10 +134,12 @@ class Body{
     double GetMass(){return mass_;}
     double GetMomentInertia(){return mass_moment_Inertia_;}
     std::string GetName(){return bodyName_;}
+    double GetPerihelion(){return Perihelion_;}
+    double GetAphelion(){return Aphelion_;}
     double GetDiameter(){return diameter_;}
     ImgPosScale GetImgData(){return this->image_pos_scale_;};
 
-    Vector2Elm GravityForcePerMass(std::shared_ptr<Body> b);
+    Vector2Elm GravityForcePerMass(const std::shared_ptr<Body> &b) const;
 
     void UpdateAcceleration(std::vector<std::shared_ptr<Body>> *bodies);
 
@@ -149,15 +149,9 @@ class Body{
  
     void UpdateAngularPosition(const double &dt);
 
-     //aproximated initial velocity
-    void InitialVelocity(std::shared_ptr <Body> );
-
 
     void PrintBody();
 
-    Vector2Elm Transform(std::shared_ptr<Body> b);
-
-    Vector2Elm RotationTransform(std::shared_ptr<Body> b, double angle);
 
     private:
     Vector2Elm position_;
