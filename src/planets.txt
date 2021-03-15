@@ -1,5 +1,4 @@
-         
-         name   Perihelium     Aphelium   Diameter()       mass()  omega(rad/s)         x(px)         y(px)  scale.width scale.height
+         name   Perihelium    Aphelium      Diameter         mass  omega(rad/s)         x(px)         y(px)   scalewidth  scaleheight
       MERCURY 6.605968E+01 1.002384E+02 7.006635E-03 1.659125E-07  1.239933E-06   1.36719E-06   2.49023E-06 1.1099619311 1.1165951697
         VENUS 1.543786E+02 1.563891E+02 1.738231E-02 2.448467E-06 -2.992420E-07  -9.32617E-06  -4.29688E-06 1.0932272477 1.0932272477
         EARTH 2.112474E+02 2.184278E+02 1.831864E-02 3.001508E-06  7.302633E-05  -1.21094E-05  -9.76563E-08 1.0638773109 1.0654242063

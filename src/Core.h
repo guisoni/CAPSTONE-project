@@ -6,6 +6,7 @@
 #include "SDL2/SDL_image.h"
 #include "Physics.h"
 #include <limits>
+
 enum PlanetsEnum{KMERCURY,KVENUS, KEARTH, KMOON, KMARS, KJUPITER, KSATURN, KURANUS, KNEPTUNE, KPLUTO, KSUN};
 class Core{
     public: 

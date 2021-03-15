@@ -11,7 +11,6 @@
 #include <numeric>
 
 
-
 class ImgPosScale{
     public:
         ImgPosScale():x_{0},y_{0}, scaleWidth_{0},scaleHeight_{0}{}
@@ -175,46 +174,6 @@ class Body{
     double diameter_; 
     ImgPosScale image_pos_scale_;
     friend class SolarSystem;
-};
-
-class SolarSystem{
-    public:
-    static SolarSystem* GetSolarSystem();
-
-    void ImportData();
-    
-    void AddBody(std::unique_ptr<Body> body);
-
-    void Update(const double dt);
-
-    void PrintBody(int id);
-
-    void TotalMass();
-
-    void CenterOfMass();
-
-    double GetTotalMass(){return totalMass_;}
-
-    Vector2Elm GetPosition(){return position_;}
-
-    bool GetIsImported(){return is_imported_;}
-
-    int GetNumberOfBodies(){return bodies_.size();}
-
-    std::shared_ptr<Body> GetBody(int id){return bodies_.at(id);}
-
-    std::string BodyName(int id){return bodies_.at(id)->GetName();}   
-
-    void InitialConditions();
-   
-    private:
-    SolarSystem(){}
-    static SolarSystem* solar_system_;
-    std::vector<std::shared_ptr<Body>> bodies_;
-    bool is_start_ = true;
-    Vector2Elm position_;
-    double totalMass_= 0;;
-    bool is_imported_= false;
 };
 
 #endif

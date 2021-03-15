@@ -6,6 +6,8 @@
 #include "Textures.h"
 #include "PixelMath.h"
 #include <iomanip>
+#include "SolarSystem.h"
+
 Core *Core::GetCore(){
     if(core_ == nullptr){
         core_= new Core(); 

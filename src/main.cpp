@@ -2,6 +2,7 @@
 #include "Physics.h"
 #include "Core.h"
 #include "Textures.h"
+#include "SolarSystem.h"
 
 SolarSystem* SolarSystem::solar_system_ = nullptr;
 Core* Core::core_= nullptr;
