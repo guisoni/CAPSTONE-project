@@ -87,10 +87,10 @@ class Vector2Elm
     Vector2Elm operator/(const double &&c) const ;
 
     //this scalar product Vector2Elm 
-    Vector2Elm operator*(const Vector2Elm &b) const ;
+    double operator*(const Vector2Elm &b) const ;
     
     //this scalar product Vector2Elm 
-    Vector2Elm operator*(const Vector2Elm &&b) const ;
+    double operator*(const Vector2Elm &&b) const ;
     
     //this vectorial product a Vector2Elm
     double operator^(const Vector2Elm &b) const ;
@@ -99,20 +99,10 @@ class Vector2Elm
     double operator^(const Vector2Elm &&b) const ;
     
     double abs() const;
-Vector2Elm Transform(const Vector2Elm &b);
-Vector2Elm RotationTransform(const double &angle);
-
-    void LogarithmScale(){
-        double r = this->abs();
-        double logr = 0; 
-        if(r!= 0){
-          logr = log(AuxMath::abs<double>(r) + 1);
-          x_ *=  logr/r;
-          y_ *=  logr/r;
-        }
-
-
-    }
+    
+    Vector2Elm Transform(const Vector2Elm &b);
+    
+    Vector2Elm RotationTransform(const double &angle);
     
     double x_;
     double y_;

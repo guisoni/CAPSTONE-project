@@ -73,18 +73,18 @@ Vector2Elm Vector2Elm::operator/(const double &&c) const {
 }
 
 //this scalar product Vector2Elm 
-Vector2Elm Vector2Elm::operator*(const Vector2Elm &b) const {
+double Vector2Elm::operator*(const Vector2Elm &b) const {
     Vector2Elm a;
     a.x_ = x_ * b.x_;
     a.y_ = y_ * b.y_;
-    return a; 
+    return a.x_ + a.y_; 
 }
 //this scalar product Vector2Elm 
-Vector2Elm Vector2Elm::operator*(const Vector2Elm &&b) const {
+double Vector2Elm::operator*(const Vector2Elm &&b) const {
     Vector2Elm a;
     a.x_ = x_ * b.x_;
     a.y_ = y_ * b.y_;
-    return a; 
+    return a.x_ + a.y_; 
 }
 //this vectorial product a Vector2Elm
 double Vector2Elm::operator^(const Vector2Elm &b) const {
