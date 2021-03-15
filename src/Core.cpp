@@ -75,7 +75,6 @@ void Core::RunGame(){
     for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
         Textures::GetTextures()->AddTexture();
         std::string filename = SolarSystem::GetSolarSystem()->GetBody(index)->GetName();
-        std::cout << filename <<"\n";
         Textures::GetTextures()->TextureFromImageLoad(index,"../image/" + filename + ".png");
         SDL_Rect source{0,0,0,0};
         Textures::GetTextures()->GetTextureSize(index, source);
@@ -88,7 +87,7 @@ void Core::RunGame(){
         frame_start = SDL_GetTicks();
         Core::GetCore()->ClearRenderer();
         
-        //load textures to use
+            //load textures to use
             for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
                 SDL_Point pixelposition;
                 Vector2Elm position;
@@ -97,8 +96,6 @@ void Core::RunGame(){
                 position = thisBody->GetPosition();
                 position = position.Transform(refBody->GetPosition());
                 double R = refBody->GetDiameter()/2.0;
-                //position.y_ = position.y_ - R;
-                //position.LogarithmScale();
                 SDL_Rect source = {0, 0, 0, 0}; 
                 Textures::GetTextures()->GetTextureSize(index, source);
                 ImgPosScale imgData = thisBody->GetImgData();                
@@ -159,12 +156,6 @@ void Core::RunGame(){
                     }
                     
                     SDL_SetRenderDrawColor( sdl_renderer_, 0, 0, 0, 0xFF );
-                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2 );
-                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2+static_cast<int>(R), screen_height_/2 );
-                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2-static_cast<int>(R), screen_height_/2 );
-                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2-static_cast<int>(R) );
-                    SDL_RenderDrawPoint( sdl_renderer_, screen_width_/2, screen_height_/2+static_cast<int>(R) );
-                    std::cout << thisBody->GetName() <<" " << refBody->GetName()<<" " <<isLocked_ <<"\n";
                 }   
         }
                 
@@ -284,13 +275,13 @@ void Core::EventHandler(){
                     displ_ = {0,0};
                 break;
                 case SDLK_z:
-                     if(scale_factor_ <= 2000000000){
+                     if(scale_factor_ <= maximumScaleFactor_){
                          scale_factor_ *= 2;
                          displ_ = displ_*2;
                      }
                      break;
                 case SDLK_x:
-                     if(scale_factor_ >= 0.000000000001){
+                     if(scale_factor_ >= minimumScaleFactor_){
                          scale_factor_ /= 2;
                          displ_ =displ_/2; 
                      }
@@ -308,10 +299,10 @@ void Core::EventHandler(){
                     displ_.x_ += delta_;
                     break;
                 case SDLK_j:
-                    multiplyDelta(2);
+                    multiplyDelta(2); //doubles number of pixels you move
                     break;
                 case SDLK_m:
-                    multiplyDelta(1/2);
+                    multiplyDelta(1/2); //halves number of pixels you move
                     break;
                 case SDLK_l:
                     isLocked_ = !isLocked_;

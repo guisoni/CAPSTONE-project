@@ -52,6 +52,8 @@ class Core{
     int delta_= 1;
     const int minBodySize_ = 4;
     bool isLocked_ = false;
+    const double minimumScaleFactor_ = 7.45058E-05;
+    const double maximumScaleFactor_ = 10240000.;
 };
 #endif
 
