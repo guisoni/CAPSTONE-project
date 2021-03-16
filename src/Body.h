@@ -68,7 +68,6 @@ class Body{
  
     void UpdateAngularPosition(const double &dt);
 
-
     void PrintBody();
 
 

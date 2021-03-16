@@ -29,7 +29,7 @@ void Body::UpdateAngularPosition(const double &dt){
     if(angular_position_ >= 2*AuxMath::PI){
       angular_position_-=2*AuxMath::PI;
     }
-    if(AuxMath::degrees(angular_position_) < 0){
+    if(angular_position_ < 0){
       angular_position_+=2*AuxMath::PI;
     }
 }

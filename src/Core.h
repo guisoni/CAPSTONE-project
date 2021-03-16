@@ -30,11 +30,7 @@ class Core{
 
     void EventHandler();
     
-    void multiplyDelta(int multiply){
-        if(multiply * delta_ >=1 && multiply*delta_ <= std::numeric_limits<int>::max() ){
-            delta_ *= multiply;
-        }
-    }
+    
     private:
     Core(){};
     static Core *core_;
@@ -46,16 +42,19 @@ class Core{
     const int screen_height_{780};
     const std::size_t framesPerSecond_{60};
     const std::size_t msPerFrame_{1000 / framesPerSecond_};
-    std::size_t timeRatio_{1};
-    PlanetsEnum cameraId_ = KSUN;
+    int timeRatio_{1};
+    PlanetsEnum cameraId_ = KEARTH;
     double scale_factor_= 10000;
     Vector2Elm displ_ = {0,0};
-    Vector2Elm vel_ = {0  ,-11190/700000000};
     int delta_= 1;
     const int minBodySize_ = 4;
     bool isLocked_ = false;
     const double minimumScaleFactor_ = 7.45058E-05;
     const double maximumScaleFactor_ = 10240000.;
+    const double maximum_time_interval = 876*10; //1 minutes = 1 year 
+    const double minimum_time_interval = 0.0166666; //1 frame
+    const double dt_factor_ = 1.5;
+    double dt_;
 };
 #endif
 

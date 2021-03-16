@@ -71,9 +71,8 @@ void Core::RunGame(){
     Uint32 frame_end;
     Uint32 frame_duration;
     std::size_t target_frame_duration = msPerFrame_;
-    int frame_count = 0;
-    double dt;
-    dt = 876*10; 
+
+    dt_ = maximum_time_interval; 
     
     for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
         Textures::GetTextures()->AddTexture();
@@ -106,7 +105,7 @@ void Core::RunGame(){
                 double imgDataY= imgData.Y();
                 position.x_ = ((position.x_+ imgDataX) * scale_factor_)- displ_.x_;
                 position.y_ = ((position.y_+ imgDataY)* scale_factor_)- displ_.y_;
-                double angle =  thisBody->GetAngularPosition();
+                double angle =  refBody->GetAngularPosition();
                 if(isLocked_){
                     //transform in relation to the rotation of a planet  
                     position = position.RotationTransform(angle);
@@ -135,7 +134,7 @@ void Core::RunGame(){
                                 PixelMath::ConvertPositionToPixel(displCenter, center, zero, dest.w, dest.h);
                                 //convert position to pixel position
                                 PixelMath::ConvertPositionToPixel(position, pixelposition, source, screen_width_,screen_height_);
-                                Textures::GetTextures()->Draw(index,NULL, &dest, AuxMath::degrees(-angle), NULL, SDL_FLIP_NONE);
+                                Textures::GetTextures()->Draw(index,NULL, &dest, AuxMath::degrees<double>(-angle), NULL, SDL_FLIP_NONE);
                             } 
                     }else{
                         if(thisBody->GetName() != refBody->GetName()){ 
@@ -151,7 +150,7 @@ void Core::RunGame(){
                                 PixelMath::ConvertPositionToPixel(displCenter, center, zero, dest.w, dest.h);
                                 //convert position to pixel position
                                 PixelMath::ConvertPositionToPixel(position, pixelposition, source, screen_width_,screen_height_);
-                                Textures::GetTextures()->Draw(index,NULL, &dest, AuxMath::degrees(-angle), NULL, SDL_FLIP_NONE);
+                                Textures::GetTextures()->Draw(index,NULL, &dest, AuxMath::degrees<double>(-angle), NULL, SDL_FLIP_NONE);
                             }    
                         }else{
                            Textures::GetTextures()->Draw(index,NULL, &dest, 0.0, NULL, SDL_FLIP_NONE);   
@@ -165,17 +164,18 @@ void Core::RunGame(){
         Core::GetCore()->Renderer();
         Core::GetCore()->EventHandler();  
         int iteractions = 0;
+        //time_Ratio_ is set to 1 if more precision needed increase the value.
         while(iteractions < timeRatio_){
-            SolarSystem::GetSolarSystem()->Update(dt);
+            SolarSystem::GetSolarSystem()->Update(dt_);
             iteractions++;
         }
-        iteractions = 0;
+        
         //SolarSystem::GetSolarSystem()->PrintBody(2);
         frame_end = SDL_GetTicks();
 
+
         // Keep track of how long each loop through the input/update/render cycle
         // takes.
-        frame_count++;
         frame_duration = frame_end - frame_start;
 
 
@@ -184,17 +184,7 @@ void Core::RunGame(){
         // achieve the correct frame rate.
         if (frame_duration < target_frame_duration) {
             SDL_Delay(target_frame_duration - frame_duration);
-        }else{
-                if(timeRatio_>=2){
-                    timeRatio_ -= 1;
-                }
-            if (frame_end - title_timestamp >= 1000) {
-                frame_count = 0;
-                //std::cout<<"Time Ratio " <<timeRatio_*dt<<"\n";
-                title_timestamp = frame_end;
-            }
         }
-
     }
     for(int index = 0; index < SolarSystem::GetSolarSystem()->GetNumberOfBodies();index++){
         Textures::GetTextures()->EndTexture(index);
@@ -302,15 +292,32 @@ void Core::EventHandler(){
                     displ_.x_ += delta_;
                     break;
                 case SDLK_j:
-                    multiplyDelta(2); //doubles number of pixels you move
+                    if(delta_ + 1 < 3 * screen_width_){
+                        delta_ += 1;
+                    }
                     break;
                 case SDLK_m:
-                    multiplyDelta(1/2); //halves number of pixels you move
+                    if(delta_- 1 > 1){
+                        delta_ -= 1;
+                    } 
                     break;
                 case SDLK_l:
                     isLocked_ = !isLocked_;
-                    break;    
-
+                    break; 
+                case SDLK_t:
+                    if(dt_*dt_factor_<=maximum_time_interval){
+                       dt_ *= dt_factor_;
+                    }else{
+                        dt_ = maximum_time_interval;
+                    }
+                break;   
+                case SDLK_g:
+                   if(dt_/dt_factor_ >= minimum_time_interval){
+                       dt_ /= dt_factor_;
+                    }else{
+                       dt_ = minimum_time_interval;;
+                    }
+                break;
             }
         }    
     }
