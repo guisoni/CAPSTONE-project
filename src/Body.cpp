@@ -1,4 +1,4 @@
-#include "Physics.h"
+#include "Body.h"
 
 Vector2Elm Body::GravityForcePerMass(const std::shared_ptr<Body> &b) const{
     const double GravitationalConst = 0.0000003929131713; //= GM/r3

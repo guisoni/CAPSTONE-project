@@ -1,4 +1,4 @@
-#include "Physics.h"
+#include "Body.h"
 #include "SolarSystem.h"
 
 SolarSystem* SolarSystem::GetSolarSystem(){

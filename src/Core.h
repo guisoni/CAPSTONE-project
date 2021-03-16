@@ -4,7 +4,7 @@
 #include <iostream>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
-#include "Physics.h"
+#include "Body.h"
 #include <limits>
 #include "Vector2Elm.h"
 

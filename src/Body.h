@@ -1,5 +1,5 @@
-#ifndef PHYSICS_H
-#define PHYSICS_H
+#ifndef BODY_H
+#define BODY_H
 
 #include <iostream>
 #include <cmath>

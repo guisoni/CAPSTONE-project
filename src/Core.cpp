@@ -2,7 +2,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "Core.h"
-#include "Physics.h"
+#include "Body.h"
 #include "Vector2Elm.h"
 #include "Textures.h"
 #include "PixelMath.h"
