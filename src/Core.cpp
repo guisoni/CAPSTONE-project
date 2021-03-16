@@ -34,7 +34,7 @@ void Core::Start(){
 		}
         std::cout << "SDL initialized.\n";
         // Create Window
-        sdl_window_ = SDL_CreateWindow("Snake Game", SDL_WINDOWPOS_CENTERED,
+        sdl_window_ = SDL_CreateWindow("Solar System Simulator", SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, screen_width_,
         screen_height_, SDL_WINDOW_SHOWN);
         if (sdl_window_==nullptr) {

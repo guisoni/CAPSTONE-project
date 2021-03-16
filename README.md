@@ -1,21 +1,25 @@
 # CPPND: Capstone Solar System Simulation
 
-This is my repo for the Capstone project in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213)
-My project is a simulation of a Solar System using Newton Laws to calculate the motion of the planets. The planets are in scale in relation one to another and in relation to the distances between them. The planets also rotate around its own axes, except for the Sun. 
+This is my repo for the Capstone project in the [Udacity C++ Nanodegree Program].(https://www.udacity.com/course/c-plus-plus-nanodegree--nd213)
+My project is a simulation of a Solar System, using Newton Laws to calculate the motion of the planets. The planets are in scale in relation one to another, and in relation to the distances between them. The planets also rotate around their own axes, except for the Sun. 
 
 There are the following bodies in the simulation: Sun, Mercury, Venus, Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto. Yes Pluto, I am old school.
 
+<img src="SolarSystemSimulator.png"/>
+
+<img src="SolarSystemSimulationSun.png"/>
+
 ## Assumptions: 
 * Newton Laws holds, no special relativity or general relativity used.
-* The Sun is in the center of mass of the Solar System, although not stricly true, since it is really massive compared to the rest of bodies it is a good approximation.
-* All orbits happen in the same plane but with their original size, Except for pluto, I changed the orbit of Pluto, because it would hit Neptune since they are in the same plane and in reality they are not.
-* The initial position of all bodies are generated randomically in their orbits, except for the Sun wich is in the origin and does not move, the Earth and the Moon wich start in a pre-determined configuration. 
+* The Sun is in the center of mass of the Solar System, although not stricly true, but since it is really massive compared to the rest of bodies, it is a good approximation.
+* All orbits happen in the same plane, but with their original size, except for pluto. I changed the orbit of Pluto, because it would hit Neptune, since they are in the same plane and in reality they are not.
+* The initial position of all bodies are generated randomically in their orbits, except for the Sun which is in the origin, and does not move, for the Earth, and the Moon. Both start in a pre-determined configuration. 
 
 ## Resources:
 The references I used for learning SDL were [Lazy Foo website] (https://lazyfoo.net/tutorials/SDL/index.php), and [MadsyCode](https://www.youtube.com/watch?v=1KD4Ae0tX0g&list=PL-K0viiuJ2RctP5nlJlqmHGeh66-GOZR_) youtube channel. Great resources! I learned static classes from MadsyCode, and the use of textures with Lazy Foo. And lastly but not least, the [SDL Wiki](https://wiki.libsdl.org/) page where I could read about the commands taughts in other tutorials.
 
 
-<img src="snake_game.gif"/>
+
 
 
 ## Dependencies for Running Locally
@@ -47,16 +51,16 @@ The references I used for learning SDL were [Lazy Foo website] (https://lazyfoo.
 
 The program was originally created for Linux, in a 64bit machine therefore it is configured to run in that. I have never tested it on 
 Windows or Mac. The #include "SDL2/SDL.h" and #include "SDL2/SDL_image.h" only works for Linux. You should remove the "SDL2/" part if you are
-running in other operating systems. In windows the process need a bit more steps. [click here for Lazy Foo tips](https://lazyfoo.net/tutorials/SDL/01_hello_SDL/windows/mingw/index.php).
+running in other operating systems. In windows the process needs a bit more of steps. [click here for Lazy Foo tips](https://lazyfoo.net/tutorials/SDL/01_hello_SDL/windows/mingw/index.php).
 
 ## Program Instructions
-* Keys 1,2,3,4,5,6,7,8,9,0,s: changes the reference body on center of screen in the following orther 1-Mercury, 2-Venus, 3-Earth, 4-Moon,5-Mars, 6-Jupiter, 7-Saturn, 8-Uranus, 9-Neptune, 0-Pluto, s-Sun. Resets the positon of screen to the center of a body.
-* Key l: Alternatively locks and unlocks to the planet rotation on its on axis. The program starts on Earth.
+* Keys 1,2,3,4,5,6,7,8,9,0,s: changes the reference body on center of screen in the following orther: 1-Mercury, 2-Venus, 3-Earth, 4-Moon,5-Mars, 6-Jupiter, 7-Saturn, 8-Uranus, 9-Neptune, 0-Pluto, s-Sun. It resets the positon of screen to the center of a chosen body.
+* Key l: Alternatively locks and unlocks to the planet rotation on its on axis. The program starts on Earth. It can make things spin really fast.
 * Keys z,x: Zooms in and zooms out respectively
-* Up, Down, Left, Right arrows: moves the center of screen away from the reference planet. If you want to move the screen through the solar system.
-* Keys j, m: increases and decreases the number of pixels you move at each press to the arrows. If you zoom in and out it seems to be faster since one pixel is still one pixel. The program starts with dislacement of 1 pixel.
-* Key q: Quits the application. Use it if the x window button goes out of screen. It is configured for a screen size of 1820x780. If it does not fit your screen you an change that in Core.h file screen_width_ and screen_height members. 
-* Keys: t, g: increases or decreases the increment of time used in the calculations. It increases or decreases the speed you see the bodies moving. The small time interval of 0.01666s is really smal for the machine to do all the calculations and there is lag depending on the machine, the maximum time step is equivalent to Earth complete rotation around the sun in 1 minute. Program starts with maximum time step.
+* Up, Down, Left, Right arrows: moves the center of screen away from the reference planet. In case you want to move the screen through the solar system.
+* Keys j, m: increases and decreases the number of pixels you move at each press to the arrows. If you zoom out, it seems to move faster since one pixel is still one pixel. The program starts with dislacement of 1 pixel.
+* Key q: Quits the application. Use it if the x window button goes out of screen. It is configured for a screen size of 1820x780. If it does not fit your screen you can change that in Core.h file screen_width_ and screen_height_ members. 
+* Keys: t, g: increases or decreases the increment of time used in the calculations. It seems to increase or decrease the speed you see the bodies moving. The small time interval of 0.01666s is really small for the machine to do all the calculations, therefore there might be a lag depending on the machine, the maximum time step is equivalent to Earth complete rotation around the sun in 1 minute. Program starts with maximum time step.
 
 ## Program Ilustrations.
 All the ilustrations were made by me in Krita, a professional FREE and open source painting program. [Krita website](https://krita.org/en/).
@@ -65,27 +69,25 @@ All the ilustrations were made by me in Krita, a professional FREE and open sour
 
 ### Folder src:
 
-* main.h and main.cpp - contains a few comands to start the simulation and stop the simulation an free all the memory.
+* main.cpp - calls a few comands to start the simulation and stop the simulation and free all the memory.
 
 * Body.h and body.cpp - it contains a class called Body that represents the Body subjected to the forces of other Bodies. The members are
-basically position_, velocity_, acceleration_, angular_position_, angular_velocity_, mass_, mass_moment_Inertia_, bodyName_, Perihelion_,Aphelion_, diameter_, image_pos_scale_. The last one holds the offset position and scale factors of the images that will be rendered. The methods are basically the Getters of each member and  basic newtomia physics: GravityForcePerMass(), UpdateAcceleration(), UpdateVelocity(), UpdatePosition(), UpdateAngularPosition(), PrintBody().
+basically position_, velocity_, acceleration_, angular_position_, angular_velocity_, mass_, mass_moment_Inertia_, bodyName_, Perihelion_,Aphelion_, diameter_, image_pos_scale_. The last one holds the offset position and scale factors of the images that will be rendered. The methods are basically the getters of each member or basic Newtonian Physics: GravityForcePerMass(), UpdateAcceleration(), UpdateVelocity(), UpdatePosition(), UpdateAngularPosition(), PrintBody().
 
-* SolarSystem - This static class is a wraper for all the bodies. It keeps all the bodies in a vector. And has some complementary methods to calculate the movement of the bodies. It is a static class making it easier to be used everiwere. It is through this class that Core and the Body classes interchange information. The members are SolarSystem, bodies_, is_start_, position_, totalMass_, is_imported_. The methods are
-GetSolarSystem(), ImportData(), AddBody(), Update(), PrintBody(), TotalMass(), CenterOfMass(), GetTotalMass(), GetPosition(), GetIsImported, GetNumberOfBodies, GetBody, BodyName, InitialConditions. SolarSystem class is a friend of Body class and can access all its private members.
-ImportData() impots the data from planets.txt file.
+* SolarSystem - This static class is a wrapper for all the bodies. It keeps all the bodies in a vector. And has some complementary methods to calculate the movement of the bodies. It is a static class making it easier to be used everywhere. It is through this class that Core and the Body classes interchange information. The members are SolarSystem, bodies_, is_start_, position_, totalMass_, is_imported_. The methods are
+GetSolarSystem(), ImportData(), AddBody(), Update(), PrintBody(), TotalMass(), CenterOfMass(), GetTotalMass(), GetPosition(), GetIsImported(), GetNumberOfBodies(), GetBody(), BodyName(), InitialConditions(). SolarSystem class is a friend of Body class and can access all its private members. ImportData() imports the data from planets.txt file.
 
 * planets.txt - a text file with the bodies data that is imported to the application. The data has no units since it has been divided by the Sun diameter, or the Sun Mass. The only units are pixels and radians/sec for the angular velocities. 
 
-* PixelMath.h - Contains one function to convert a position to a position on the screen screen ConvertPositionToPixel(). 
+* PixelMath.h - Contains one function to convert a position to a position on the screen called ConvertPositionToPixel(). 
 
 * Core.h and Core.cpp - This static class controls the application. It calls the functios to open or close the main window, load the textures,
-control the user inputs, and control the entire configutation. The members of this class are: core_, success_, sdl_window_, sdl_renderer_, Textexture_, screen_width_, screen_height_, framesPerSecond_, msPerFrame_, timeRatio_, cameraId_, scale_factor_, displ_, delta_, minBodySize_, isLocked_, minimumScaleFactor_, maximumScaleFactor_, maximum_time_interval, minimum_time_interval, dt_factor_, dt_.
-The methods are GetCore(), FreeCore(), Start(), RunGame(), EndGraphics(), Renderer(), GetStatus(), GetRenderer(), ClearRenderer(), EventHandler(), multiplyDelta(). RunGame() is the main method that controls everithing. It also manages time as referenced in
-[Snake Game repo](https://github.com/udacity/CppND-Capstone-Snake-Game).
+control the user inputs, and controls the entire configuration. The members of this class are: core_, success_, sdl_window_, sdl_renderer_, Textexture_, screen_width_, screen_height_, framesPerSecond_, msPerFrame_, timeRatio_, cameraId_, scale_factor_, displ_, delta_, minBodySize_, isLocked_, minimumScaleFactor_, maximumScaleFactor_, maximum_time_interval, minimum_time_interval, dt_factor_, dt_.
+The methods are GetCore(), FreeCore(), Start(), RunGame(), EndGraphics(), Renderer(), GetStatus(), GetRenderer(), ClearRenderer(), EventHandler(). RunGame() is the main method that controls everything, including what is called the "game loop". It also manages time as referenced in [Snake Game repo](https://github.com/udacity/CppND-Capstone-Snake-Game).
 
-* Textures.h and Textures.cpp - This static class is a wraper for all the textures of all the bodies. The members are textures_, rectangle_, texture_, scale_texture_, bool success_. texture_ is a vector containing all textures and scale_texture a vector containing the scale factors to apply in each texture. The methods are GetTextures(), FreeTextures(), AddTexture(), AddScaleFactor(), TextureFromImageLoad(), EndTexture(), Draw(), GetTextureSize(), GetScaleFactor(), mostly to use SDL texture structure, or to control the scaling of the images.
+* Textures.h and Textures.cpp - This static class is a wrapper for all the textures of all the bodies. The members are textures_, rectangle_, texture_, scale_texture_, bool success_. texture_ is a vector containing all textures, and scale_texture a vector containing the scale factors to apply in each texture. The methods are GetTextures(), FreeTextures(), AddTexture(), AddScaleFactor(), TextureFromImageLoad(), EndTexture(), Draw(), GetTextureSize(), GetScaleFactor(), mostly to use SDL texture structure, or to control the scaling of the images.
 
-* Vector2Elm.h Vector2Elm.cpp - contains basic math functions and basic 2D vector algebra. AuxMath is a namespace with radians(), degrees(), and sign() functions. Vector2Elm is a class with public members x_ and y_ and many vector operations mostly through operator overloading.
+* Vector2Elm.h and Vector2Elm.cpp - contains basic math functions and basic 2D vector algebra. AuxMath is a namespace with radians(), degrees(), and sign() functions. Vector2Elm is a class with public members x_ and y_ and many vector operations, mostly through operator overloading.
 Addition, subtraction, multiplication and division by a scalar, scalar product, vectorial product and modulus of vector.  
 
 
@@ -100,7 +102,7 @@ Contains this README.md and CMakeLists.txt file.
 
 ### cmake folder
 
-Contains findSDL2_image.make. Form the original [Snake Game repo](https://github.com/udacity/CppND-Capstone-Snake-Game).
+Contains findSDL2_image.make. From the original [Snake Game repo](https://github.com/udacity/CppND-Capstone-Snake-Game).
 
 ## Rubric Addressed Criteria
 
@@ -109,7 +111,7 @@ planets.txt and import the bodies data to the program. The method starts in line
 
 2- The project accepts input from a user as part of the necessary operation of the program: The project accepts inputs from the user as mentioned in *Program Instructions* above. The Core::EventHandler() method handle all the keyboard events mentioned. The method starts in line 216 of Core.cpp file.  
 
-3- The project uses Object Oriented Programming techniques. The project uses classes Vector2Elm, Body, SolarSystem, Core, Textures, ImgPosScale. They are found in the files with the same name plus .h and .cpp except for ImgPosScale that is inside Body.h file because a member of Body is ImgPosScale type.  
+3- The project uses Object Oriented Programming techniques. The project uses classes Vector2Elm, Body, SolarSystem, Core, Textures, ImgPosScale. They are found in the files with the same name plus .h and .cpp except for ImgPosScale that is inside Body.h file because a member of Body is of ImgPosScale type.  
 
 4-The project makes use of references in function declarations. It is used a lot in the project. Examples are in Texture.h line 14 
 void AddScaleFactor(const int &refmeasure, const double &Diam) and line 15 void TextureFromImageLoad(const int &index, const std::string &filename) but it can be found in many other places.
@@ -120,7 +122,7 @@ SolarSystem.h line 16 public, line 45 private. Core.h line 13 public, line 34 pr
 
 ## Final Comments
 
-Thanks to all the Udacity team for this great course.
+Thanks to all the Udacity team for this great course, I have learned a lot. Please, leave comments if you like this program and give sugestions for further improvements. 
 
 
 
